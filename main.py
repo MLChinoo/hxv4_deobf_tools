@@ -1,12 +1,9 @@
 import os
 import shutil
 
+import config
 from PlaintextDictionary import PlaintextDictionary
-from utils.move_bomhash_files import get_unique_name, files_identical, merge_dir
-
-game_dir = r"C:\Users\MLChinoo\Desktop\TenShiSouZou"
-game_exe = os.path.join(game_dir, "tenshi_sz.exe")
-rename_dir = r"C:\Users\MLChinoo\Desktop\tenshi_hikari_dumps"
+from utils.move_bomhash_files import get_unique_name, merge_dir
 
 dictionary = (PlaintextDictionary(
     pathnames=[
@@ -14,11 +11,16 @@ dictionary = (PlaintextDictionary(
     ],
     filenames=[
         "rule_19.png",
-
+        "base.stage"
     ]
 )
               .from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\tenshi_dumps\Extractor_Output")
               .from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\downloadfile\data")
+              .from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\senren_dumps")
+              .from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\sanoba_dumps")
+              .scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\tenshi_hikari_dumps")
+              .from_base_stage(r"C:\Users\MLChinoo\Desktop\tenshi_hikari_dumps\data\bgimage\base.stage")
+              .duplicate_lower()
               )
 
 path_hash_map = {}
@@ -40,8 +42,12 @@ with open("HxNames.lst", mode="r", encoding="UTF-8") as h:
         else:
             raise Exception(hx_hash)
 
-path_to_hash: set = set(dictionary.pathname_plaintexts) - set(path_hash_map.keys())
-file_to_hash: set = set(dictionary.filename_plaintexts) - set(file_hash_map.keys())
+path_to_hash: set = dictionary.pathname_plaintexts - set(path_hash_map.keys())
+file_to_hash: set = dictionary.filename_plaintexts - set(file_hash_map.keys())
+print(f"新增hash：")
+for to_hash in (path_to_hash, file_to_hash):
+    for t in to_hash:
+        print(t)
 
 # krkr_hxv4_dumphash在命令运行目录下生成文件，而不是游戏目录下
 with (open("files.txt", "w", encoding="utf-16le") as f,
@@ -51,7 +57,7 @@ with (open("files.txt", "w", encoding="utf-16le") as f,
     for filename_plaintext in file_to_hash:
         f.write(f"{filename_plaintext}\n")
 
-os.startfile(game_exe)
+os.startfile(config.game_exe)
 input("计算完成后手动按回车继续：")
 
 with (open("files_match.txt", "r", encoding="utf-16le") as fm,
@@ -82,12 +88,12 @@ with open("HxNames.lst", mode="w", encoding="UTF-8") as h:
                 continue
             h.write(f"{hash}:{name}\n")
 
-if rename_dir != "":
+if config.rename_dir != "":
     renamed_file_count = 0
     renamed_dir_count = 0
     hash_path_map = {value: key for key, value in path_hash_map.items()}
     hash_file_map = {value: key for key, value in file_hash_map.items()}
-    for root, dirs, files in os.walk(rename_dir, topdown=False):
+    for root, dirs, files in os.walk(config.rename_dir, topdown=False):
         for f in files:
             filepath = os.path.join(root, f)
             if f in hash_file_map.keys():
@@ -103,12 +109,10 @@ if rename_dir != "":
         for d in dirs:
             dirpath = os.path.join(root, d)
             if d in hash_path_map.keys():
-                # 1️⃣ 去掉末尾的斜杠，得到真正的目标目录名
                 assert hash_path_map[d][-1] == "/"
                 target_rel_path = hash_path_map[d].rstrip("/\\")  # locale/jp
                 dest_path = os.path.join(root, target_rel_path)  # .../locale/jp
 
-                # 2️⃣ 只确保“父目录”存在，而不是整个目标目录
                 parent_dir = os.path.dirname(dest_path)  # .../locale
                 os.makedirs(parent_dir, exist_ok=True)
 
