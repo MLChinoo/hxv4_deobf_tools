@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import subprocess
 import traceback
 from json import JSONDecodeError
 from pathlib import Path
@@ -72,7 +73,8 @@ class PlaintextDictionary:
                 return False
             try:
                 with path.open("rb") as f:
-                    return f.read(3) == b"PSB"
+                    header = f.read(3)
+                    return header == b"PSB" or header == b"mdf"
             except OSError:
                 return False
         def convert_to_custom_extension(filename: str, new_extension: str) -> str:
@@ -107,7 +109,7 @@ class PlaintextDictionary:
 
                         if not os.path.exists(json_filepath):
                             shutil.copy(filepath, temp_filepath := os.path.join(config.temp_dir, file))
-                            os.system(f"{config.psbdecompile_exe} -raw {temp_filepath}")
+                            subprocess.run([config.psbdecompile_exe, '-raw', temp_filepath], check=True)
                             os.remove(temp_filepath)
                             resx_json_filename = convert_to_custom_extension(file, ".resx.json")
                             resx_json_filepath = os.path.join(config.temp_dir, resx_json_filename)
