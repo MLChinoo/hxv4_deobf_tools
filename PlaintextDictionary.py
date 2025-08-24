@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import shutil
@@ -228,6 +229,57 @@ class PlaintextDictionary:
             for prefix in prefixes:
                 image_file = image_file_string.replace("TIME", prefix)
                 self.filename_plaintexts.add(f"{image_file}.png")
+        return self
+
+    """
+    从cglist.csv文件中获取cg文件名evimage和sd
+    需要运行两次脚本
+    """
+    def from_cglist_csv(self, cglist_csv_filepath: str):
+        with open(cglist_csv_filepath, mode="r", encoding="utf-16le") as f:
+            cglist_csv = csv.reader(f)
+            for row in cglist_csv:
+                header = row[0]
+                if header.startswith("thum_"):
+                    assert len(header) == 10  # thum_EV101, thum_SD001
+                    cg_name = header[5:]  # EV101, SD001
+                    cg_type = cg_name[:2]  # EV, SD
+                    match cg_type.lower():
+                        case "ev":
+                            self.filename_plaintexts.update((
+                                f"{cg_name}a.pimg",
+                                f"{cg_name}b.pimg",
+                                f"{cg_name}mm.pimg",
+                                f"{cg_name}a_censored.pimg",
+                                f"{cg_name}b_censored.pimg",
+                                f"{cg_name}mm_censored.pimg",
+                                f"{cg_name}_a.pimg",
+                                f"{cg_name}_b.pimg",
+                                f"{cg_name}_mm.pimg",
+                                f"{cg_name}_a_censored.pimg",
+                                f"{cg_name}_b_censored.pimg",
+                                f"{cg_name}_mm_censored.pimg",
+                                f"thum_{cg_name}.jpg",
+                                f"thum_{cg_name}.png",
+                                f"thum_{cg_name}_censored.jpg",
+                                f"thum_{cg_name}_censored.png",
+                                f"savethum_{cg_name}.jpg",
+                                f"savethum_{cg_name}.png"
+                            ))
+                        case "sd":
+                            self.filename_plaintexts.update((
+                                f"{cg_name}.mtn",
+                                f"{cg_name}.psb",
+                                f"thum_{cg_name}.jpg",
+                                f"thum_{cg_name}.png"
+                            ))
+                            for cg_diff in row[2:]:
+                                cg_diff = cg_diff.strip()
+                                self.filename_plaintexts.update((
+                                    f"{cg_diff}.jpg",
+                                    f"{cg_diff}.png",
+                                    f"{cg_diff}.asd",
+                                ))
         return self
 
 if __name__ == "__main__":
