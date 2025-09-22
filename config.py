@@ -1,10 +1,10 @@
 import os
 
-game_dir = r"C:\Users\MLChinoo\Desktop\TenShiSouZou"
+game_dir = r"D:\gals\天使嚣嚣 hf"
 
 game_exe = os.path.join(game_dir, "tenshi_sz.exe")
 
-rename_dir = r"C:\Users\MLChinoo\Desktop\tenshi_hikari_dumps"
+rename_dir = r"C:\Users\MLChinoo\Desktop\3lj_data"
 
 temp_dir = "temp"
 

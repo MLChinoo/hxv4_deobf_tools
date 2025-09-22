@@ -1,6 +1,7 @@
 import csv
 import json
 import os
+import re
 import shutil
 import subprocess
 import traceback
@@ -241,7 +242,7 @@ class PlaintextDictionary:
             for row in cglist_csv:
                 header = row[0]
                 if header.startswith("thum_"):
-                    assert len(header) == 10  # thum_EV101, thum_SD001
+                    # assert len(header) == 10  # thum_EV101, thum_SD001
                     cg_name = header[5:]  # EV101, SD001
                     cg_type = cg_name[:2]  # EV, SD
                     match cg_type.lower():
@@ -280,6 +281,98 @@ class PlaintextDictionary:
                                     f"{cg_diff}.png",
                                     f"{cg_diff}.asd",
                                 ))
+        return self
+
+    """
+    从soundlist.csv文件中获取bgm文件名
+    需要运行两次脚本
+    """
+    def from_soundlist_csv(self, soundlist_csv_filepath):
+        with open(soundlist_csv_filepath, mode="r", encoding="utf-16le") as f:
+            soundlist_csv = csv.reader(f)
+            for row in soundlist_csv:
+                if len(row) > 0:
+                    header = row[0]
+                    if not header.startswith("#"):
+                        self.filename_plaintexts.update((
+                            f"{header}.opus",
+                            f"{header}.opus.sli"
+                        ))
+        return self
+
+    """
+    从KrkrDump的log中获取文件名
+    适用于从未在之前发行的游戏中出现的、以及无规律可获取其文件名的文件，动态运行一下也许有意外收获...?
+    """
+    def from_krkrdump_logs(self, krkrdump_dir):
+        for filename in os.listdir(krkrdump_dir):
+            if all((filename.startswith("KrkrDump-"), filename.endswith(".log"))):
+                filepath = os.path.join(krkrdump_dir, filename)
+                with open(filepath, mode="r", encoding="UTF-8") as log_f:
+                    krkrdump_log = log_f.readlines()
+                for line in krkrdump_log:
+                        match = re.search(r'"([^"]*)"', line)
+                        if match:
+                            content = match.group(1)
+                            if "NameHash: " in line:
+                                self.filename_plaintexts.add(content)
+                            elif "PathHash: " in line:
+                                self.pathname_plaintexts.add(content)
+        return self
+
+    """
+    添加各人物的系统语音，从charvoice.csv获取人物前缀名，语音后缀名来自天使嚣嚣trial，可能涵盖不全
+    """
+    def add_char_sys_voices(self, charvoice_csv_filepath):
+        sys_voice_suffixes = (
+            "after",
+            "attention0",
+            "attention1",
+            "attention2",
+            "attention3",
+            "backlog",
+            "chart",
+            "config",
+            "config_easy",
+            "custom",
+            "dialog",
+            "end",
+            "extra",
+            "extra_bu",
+            "extra_cg",
+            "extra_scene",
+            "game",
+            "game2",
+            "goodbye",
+            "jump",
+            "load",
+            "mouse",
+            "pad",
+            "rec",
+            "reset",
+            "save",
+            "shortcut",
+            "sound",
+            "text",
+            "tittle",
+            "tittleback",
+            "voice",
+            "volume",
+            "window",
+            "yuzu",
+
+            "title",
+            "titleback"
+        )
+        with open(charvoice_csv_filepath, mode="r", encoding="utf-16le") as f:
+            charvoice_csv = csv.reader(f)
+            for row in charvoice_csv:
+                if len(row) > 0:
+                    header = row[0].replace("\ufeff", "")  # remove bom
+                    if not header.startswith("#") and not header.startswith("DEFAULT"):
+                        char_prefix = row[1].split("_")[0]
+                        for sys_voice_suffix in sys_voice_suffixes:
+                            self.filename_plaintexts.add(f"{char_prefix}_{sys_voice_suffix}.ogg")
         return self
 
 if __name__ == "__main__":

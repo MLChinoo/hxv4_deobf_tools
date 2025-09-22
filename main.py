@@ -11,15 +11,20 @@ dictionary = (PlaintextDictionary(
     ],
     filenames=[
         "rule_19.png",
-        "base.stage"
+        "base.stage",
+        "cglist.csv"
     ]
 )
-              .from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\tenshi_dumps\Extractor_Output")
-              .from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\downloadfile\data")
-              .from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\senren_dumps")
-              .from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\sanoba_dumps")
-              .scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\tenshi_hikari_dumps")
-              .from_base_stage(r"C:\Users\MLChinoo\Desktop\tenshi_hikari_dumps\data\bgimage\base.stage")
+              #.from_unobfuscated_directory(r"D:\gals\dumps\tenshi_hikari_dumps")
+              #.from_unobfuscated_directory(r"D:\gals\dumps\senren_dumps")
+              #.from_unobfuscated_directory(r"D:\gals\dumps\stella_dumps")
+              #.from_unobfuscated_directory(r"D:\gals\dumps\sanoba_dumps")
+              #.scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data")
+              #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data\bgimage\base.stage")
+              #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data\main\cglist.csv")
+              #.from_soundlist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data\main\soundlist.csv")
+              #.from_krkrdump_logs(r"C:\Users\MLChinoo\Desktop\krkrdump")
+              .add_char_sys_voices(r"C:\Users\MLChinoo\Desktop\3lj_data\main\charvoice.csv")
               .duplicate_lower()
               )
 
@@ -68,7 +73,9 @@ with (open("files_match.txt", "r", encoding="utf-16le") as fm,
         line = line.replace("\ufeff", "")  # remove bom
         if line.strip() == "":
             continue
-        assert len(splitted := line.replace("\n", "").split(",")) == 2, line
+        if len(splitted := line.replace("\n", "").split(",")) != 2:
+            print(f"illegal line ignored: {line}")
+            continue
         hx_name, hx_hash = splitted
         file_hash_map[hx_name] = hx_hash
 
@@ -77,7 +84,9 @@ with (open("files_match.txt", "r", encoding="utf-16le") as fm,
         line = line.replace("\ufeff", "")  # remove bom
         if line.strip() == "":
             continue
-        assert len(splitted := line.replace("\n", "").split(",")) == 2, line
+        if len(splitted := line.replace("\n", "").split(",")) != 2:
+            print(f"illegal line ignored: {line}")
+            continue
         hx_name, hx_hash = splitted
         path_hash_map[hx_name] = hx_hash
 
