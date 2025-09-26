@@ -89,5 +89,5 @@ def move_bomhash_files(root_dir):
             print(f"已删除目录: {target_path}")
 
 if __name__ == "__main__":
-    root_directory = r"C:\Users\MLChinoo\Desktop\3lj_data"  # 替换为你的实际路径
+    root_directory = r"C:\Users\MLChinoo\Desktop\3lj_data_full"  # 替换为你的实际路径
     move_bomhash_files(root_directory)

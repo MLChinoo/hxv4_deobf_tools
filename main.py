@@ -12,19 +12,18 @@ dictionary = (PlaintextDictionary(
     filenames=[
         "rule_19.png",
         "base.stage",
-        "cglist.csv"
+        "cglist.csv",
+        "soundlist.csv",
+        "charvoice.csv"
     ]
 )
-              #.from_unobfuscated_directory(r"D:\gals\dumps\tenshi_hikari_dumps")
-              #.from_unobfuscated_directory(r"D:\gals\dumps\senren_dumps")
-              #.from_unobfuscated_directory(r"D:\gals\dumps\stella_dumps")
-              #.from_unobfuscated_directory(r"D:\gals\dumps\sanoba_dumps")
-              #.scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data")
-              #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data\bgimage\base.stage")
-              #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data\main\cglist.csv")
-              #.from_soundlist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data\main\soundlist.csv")
-              #.from_krkrdump_logs(r"C:\Users\MLChinoo\Desktop\krkrdump")
-              .add_char_sys_voices(r"C:\Users\MLChinoo\Desktop\3lj_data\main\charvoice.csv")
+              #.from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\3lj_data")
+              #.scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
+              #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\bgimage\base.stage")
+              #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\cglist.csv")
+              #.from_soundlist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\soundlist.csv")
+              #.add_char_sys_voices(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\charvoice.csv")
+              .from_krkrdump_logs(r"C:\Users\MLChinoo\Desktop\krkrdump")
               .duplicate_lower()
               )
 

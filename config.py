@@ -4,7 +4,7 @@ game_dir = r"D:\gals\天使嚣嚣 hf"
 
 game_exe = os.path.join(game_dir, "tenshi_sz.exe")
 
-rename_dir = r"C:\Users\MLChinoo\Desktop\3lj_data"
+rename_dir = r"C:\Users\MLChinoo\Desktop\3lj_data_full"
 
 temp_dir = "temp"
 

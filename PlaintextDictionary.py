@@ -228,8 +228,9 @@ class PlaintextDictionary:
         for stage in base_stage["stages"].values():
             image_file_string: str = stage["image"]
             for prefix in prefixes:
-                image_file = image_file_string.replace("TIME", prefix)
-                self.filename_plaintexts.add(f"{image_file}.png")
+                if prefix is not None:
+                    image_file = image_file_string.replace("TIME", prefix)
+                    self.filename_plaintexts.add(f"{image_file}.png")
         return self
 
     """

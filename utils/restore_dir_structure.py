@@ -25,7 +25,7 @@ def restore_dir_structure(folder_path):
             print(f"移动：{file_path} -> {new_file_path}")
 
 if __name__ == "__main__":
-    root_dir = r"C:\Users\MLChinoo\Desktop\tenshi_hikari_dumps"
+    root_dir = r"C:\Users\MLChinoo\Desktop\3lj_data_full"
     for dir in os.listdir(root_dir):
         folder = os.path.join(root_dir, dir)
         print(folder)
