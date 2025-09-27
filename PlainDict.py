@@ -16,7 +16,7 @@ from utils.check_hash import is_path_hash, is_name_hash
 from utils.tjs_parser import parse_base_stage_to_json5
 
 
-class PlaintextDictionary:
+class PlainDict:
     pathname_plaintexts, filename_plaintexts = set(), set()
 
     def __init__(self, pathnames: list | tuple = (), filenames: list | tuple = ()):
