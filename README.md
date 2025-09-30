@@ -21,7 +21,7 @@ A2: 支持从hxv4 crypted游戏（举例：魔女的夜宴 Steam版、星光咖�
 
 A3: 使用如下，请自行尝试：
 
-1. 使用GARbro或KrkrExtractForCxdecV2提取xp3
+1. 使用GARbro2或KrkrExtractForCxdecV2提取xp3
 
 2. 使用utils/restore_dir_structure.py和utils/move_bomhash_files.py初步整理提取出的文件夹结构
 
@@ -43,6 +43,11 @@ A3: 使用如下，请自行尝试：
 
 7. 运行后生成的HxNames.lst可供GARbro等工具使用
 
+**使用此项目生成：**
+
+- [天使嚣嚣 Hikari - ten_sz_hxnames](https://github.com/MLChinoo/ten_sz_hxnames)
+- [Limelight Lemonade Jam - lllj_hxnames](https://github.com/MLChinoo/lllj_hxnames)
+
 **特别感谢：**
 
 - [UlyssesWu/FreeMote](https://github.com/UlyssesWu/FreeMote)
@@ -50,3 +55,4 @@ A3: 使用如下，请自行尝试：
 - [crskycode/GARbro](https://github.com/crskycode/GARbro)
 - [YeLikesss/KrkrExtractForCxdecV2](https://github.com/YeLikesss/KrkrExtractForCxdecV2)
 - [crskycode/KrkrDump](https://github.com/crskycode/KrkrDump)
+- [UserUnknownFactor/GARbro2](https://github.com/UserUnknownFactor/GARbro2)
