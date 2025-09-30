@@ -24,4 +24,4 @@ def get_progress_percent(root_dir: str) -> float:
     return 1 - (hashed_path + hashed_file) / (total_path + total_file)
 
 if __name__ == "__main__":
-    print(f"{100 * get_progress_percent(r"D:\gals\dumps\tenshi_hikari_dumps")}%")
+    print(f"{100 * get_progress_percent(r"C:\Users\MLChinoo\Desktop\3lj_data_full")}%")

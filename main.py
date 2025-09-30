@@ -14,7 +14,11 @@ dictionary = (PlainDict(
         "base.stage",
         "cglist.csv",
         "soundlist.csv",
-        "charvoice.csv"
+        "charvoice.csv",
+        "op.mp4",
+        "op720p.wmv",
+        "tougetsu_multi.opus",
+        "pf_moonlight_multi.opus"
     ]
 )
 # 在这里添加明文字典来源：
@@ -24,7 +28,7 @@ dictionary = (PlainDict(
               #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\cglist.csv")
               #.from_soundlist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\soundlist.csv")
               #.add_char_sys_voices(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\charvoice.csv")
-              .from_krkrdump_logs(r"C:\Users\MLChinoo\Desktop\krkrdump")
+              # .from_krkrdump_logs(r"C:\Users\MLChinoo\Desktop\krkrdump")
 # 结束
               .duplicate_lower()
               )
