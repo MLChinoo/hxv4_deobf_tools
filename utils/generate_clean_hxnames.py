@@ -2,7 +2,6 @@
 原HxNames.lst为了命中更多的hash名称会多出很多冗余条目，
 若需发布，可用此方法从已有已反混淆的目录生成一份干净的HxNames.lst
 """
-import os
 from pathlib import Path
 
 from utils.check_hash import is_name_hash, is_path_hash
@@ -12,6 +11,7 @@ def generate_clean_hxnames(deobfuscated_dir: Path, save_filepath: Path):
     path_hash_map = {}
     file_hash_map = {}
     save_file = open(save_filepath, mode="w", encoding="UTF-8")
+    saved_items = set()
     ignored_items = 0
 
     with open("../HxNames.lst", mode="r", encoding="UTF-8") as h:
@@ -39,7 +39,9 @@ def generate_clean_hxnames(deobfuscated_dir: Path, save_filepath: Path):
                         print(f"{hx_name} not in file hash map, ignored")
                         ignored_items += 1
                         continue
-                    save_file.write(f"{file_hash_map[hx_name]}:{hx_name}\n")
+                    if hx_name not in saved_items:
+                        save_file.write(f"{file_hash_map[hx_name]}:{hx_name}\n")
+                        saved_items.add(hx_name)
                 elif child.is_dir():
                     hx_name = str(child.relative_to(xp3_dir)).replace("\\", "/")
                     for subdir in hx_name.split("/"):
@@ -51,8 +53,9 @@ def generate_clean_hxnames(deobfuscated_dir: Path, save_filepath: Path):
                         print(f"{hx_name} not in path hash map, ignored")
                         ignored_items += 1
                         continue
-                    save_file.write(f"{path_hash_map[hx_name]}:{hx_name}\n")
-                    
+                    if hx_name not in saved_items:
+                        save_file.write(f"{path_hash_map[hx_name]}:{hx_name}\n")
+                        saved_items.add(hx_name)
     save_file.close()
     print(f"\nclean hxnames generated, ignored {ignored_items} item(s).")
                     
