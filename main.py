@@ -1,5 +1,6 @@
 import os
 import shutil
+from pathlib import Path
 
 import config
 from PlainDict import PlainDict
@@ -23,12 +24,12 @@ dictionary = (PlainDict(
 )
 # 在这里添加明文字典来源：
               #.from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\3lj_data")
-              #.scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
-              #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\bgimage\base.stage")
-              #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\cglist.csv")
+              .scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
+              #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\base.stage")
+              #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\cglist.csv")
               #.from_soundlist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\soundlist.csv")
               #.add_char_sys_voices(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\charvoice.csv")
-              # .from_krkrdump_logs(r"C:\Users\MLChinoo\Desktop\krkrdump")
+              #.from_krkrdump_logs(r"C:\Users\MLChinoo\Desktop\lllj_krkrdumps")
 # 结束
               .duplicate_lower()
               )
@@ -117,9 +118,9 @@ if config.rename_dir != "":
                 try:
                     os.rename(filepath, new_path)
                     renamed_file_count += 1
-                    print(f"文件重命名成功: {filepath} -> {new_path}")
+                    print(f"文件重命名成功: {Path(filepath).relative_to(config.rename_dir)} -> {Path(new_path).relative_to(config.rename_dir)}")
                 except Exception as e:
-                    print(f"文件重命名失败: {filepath} -> {new_path}，原因: {e}")
+                    print(f"文件重命名失败: {Path(filepath).relative_to(config.rename_dir)} -> {Path(new_path).relative_to(config.rename_dir)}，原因: {e}")
         for d in dirs:
             dirpath = os.path.join(root, d)
             if d in hash_path_map.keys():
@@ -136,7 +137,7 @@ if config.rename_dir != "":
                     else:
                         shutil.move(dirpath, dest_path)
                     renamed_dir_count += 1
-                    print(f"目录重命名成功: {dirpath} -> {dest_path}")
+                    print(f"目录重命名成功: {Path(dirpath).relative_to(config.rename_dir)} -> {Path(dest_path).relative_to(config.rename_dir)}")
                 except Exception as e:
-                    print(f"目录重命名失败: {dirpath} -> {dest_path}，原因: {e}")
+                    print(f"目录重命名失败: {Path(dirpath).relative_to(config.rename_dir)} -> {Path(dest_path).relative_to(config.rename_dir)}，原因: {e}")
     print(f"重命名完成：共重命名文件 {renamed_file_count} 个，目录 {renamed_dir_count} 个")
