@@ -79,6 +79,7 @@ class PlainDict:
                     return header == b"PSB" or header == b"mdf"
             except OSError:
                 return False
+            
         def convert_to_custom_extension(filename: str, new_extension: str) -> str:
             if not new_extension.startswith("."):
                 new_extension = "." + new_extension
@@ -92,6 +93,77 @@ class PlainDict:
             "pimg": [],
             "motion": []
         }
+        
+        def handle_data_item(data_item: dict):
+            if data_item.get("name") in ("bgm", "live", "liveout") and "replay" in data_item.keys():
+                # 获取背景音乐文件名  bgm
+                filename = data_item["replay"]["filename"]
+                if filename is not None:
+                    self.filename_plaintexts.update([
+                        f"{filename}.ogg",
+                        f"{filename}.ogg.sli",
+                        f"{filename}.opus",
+                        f"{filename}.opus.sli",
+                        f"{filename}.mchx",
+                        f"{filename}.mchx.sli"
+                    ])
+            elif data_item.get("name") in ("lse", "lse2") and "replay" in data_item.keys():
+                # sound
+                filename_raw: str = data_item["replay"]["filename"]
+                if filename_raw is not None:
+                    if "|" in filename_raw:
+                        filenames = filename_raw.split("|")
+                    else:
+                        filenames = [filename_raw]
+                    for filename in filenames:
+                        self.filename_plaintexts.update([
+                            f"{filename}.ogg",
+                            f"{filename}.ogg.sli"
+                        ])
+            elif data_item.get("name") == "stage" and "redraw" in data_item.keys():
+                # 获取背景图片文件名  bgimage
+                filename = data_item["redraw"]["imageFile"]["file"]
+                self.filename_plaintexts.update([
+                    f"{filename}.png"
+                ])
+            elif data_item.get("class") == "msgwin":
+                # 获取人物stand文件名  fgimage
+                if "redraw" in data_item.keys():
+                    filename_with_ext: str = data_item["redraw"]["imageFile"]["file"]
+                    assert filename_with_ext.endswith(".stand")
+                    self.filename_plaintexts.add(
+                        f"{filename_with_ext}"
+                    )
+                elif "stand" in data_item.keys():
+                    filename_with_ext: str = data_item["stand"]["file"]
+                    assert filename_with_ext.endswith(".stand")
+                    self.filename_plaintexts.add(
+                        f"{filename_with_ext}"
+                    )
+            elif data_item.get("class") == "event":
+                if data_item.get("name") == "ev" and "redraw" in data_item.keys():
+                    # 1.在texts中获取cg文件名 evimage
+                    # from_cglist_csv()已实现此来源 故略
+                    # 2.在lines中获取image
+                    filename = data_item["redraw"]["imageFile"]["file"]
+                    self.filename_plaintexts.add(
+                        f"{filename}.png"
+                    )
+                elif data_item.get("name") == "bg_voice" and "redraw" in data_item.keys():
+                    # vlist (e.g. bgv007_07_歓声.csv)
+                    filename_with_ext = data_item["redraw"]["imageFile"]["file"]["storage"]
+                    self.filename_plaintexts.add(
+                        f"{filename_with_ext}"
+                    )
+
+        def handle_data_block(data_block: list):
+            # lines和texts里某些data字段结构是一致的，因此可以封装成一个共同方法进行处理
+            for data in data_block:
+                if type(data) == list:
+                    for data_item in data:
+                        if type(data_item) == dict:
+                            handle_data_item(data_item)
+                            
         if not os.path.exists(config.psb_type_cache_json):
             open(config.psb_type_cache_json, mode="w", encoding="UTF-8")
         with suppress(JSONDecodeError):
@@ -127,62 +199,40 @@ class PlainDict:
                             self.filename_plaintexts.add(f"{psb_json['name']}.scn")
 
                             for scene in psb_json["scenes"]:
-                                # 获取语音文件名  voice
                                 if "texts" in scene.keys():
                                     for text in scene["texts"]:
-                                        for voice_index in (2, 3):
-                                            with suppress(IndexError, TypeError):
-                                                voice_source = text[voice_index]
-                                                voice_name_raw: str = voice_source[0]["voice"]
-                                                if "|" in voice_name_raw:
-                                                    voice_names = voice_name_raw.split("|")
-                                                else:
-                                                    voice_names = [voice_name_raw]
-                                                for voice_name in voice_names:
-                                                    self.filename_plaintexts.update([
-                                                        f"{voice_name}.ogg",
-                                                        f"{voice_name}.ogg.sli",
-                                                        f"{voice_name}.opus",
-                                                        f"{voice_name}.opus.sli"
-                                                    ])
+                                        for text_item in text:
+                                            if type(text_item) == list:
+                                                for text_item_item in text_item:
+                                                    if type(text_item_item) == dict and "voice" in text_item_item.keys():
+                                                        # 获取语音文件名  voice
+                                                        voice_source = text_item_item
+                                                        voice_name_raw: str = voice_source["voice"]
+                                                        if "|" in voice_name_raw:
+                                                            voice_names = voice_name_raw.split("|")
+                                                        else:
+                                                            voice_names = [voice_name_raw]
+                                                        for voice_name in voice_names:
+                                                            self.filename_plaintexts.update([
+                                                                f"{voice_name}.ogg",
+                                                                f"{voice_name}.ogg.sli",
+                                                                f"{voice_name}.opus",
+                                                                f"{voice_name}.opus.sli",
+                                                                f"{voice_name}.ini"
+                                                            ])     
+                                            elif type(text_item) == dict and "data" in text_item.keys():
+                                                handle_data_block(text_item["data"])
 
                                 for line in scene["lines"]:  # 0000
                                     if type(line) == list:
                                         for line_item in line:
                                             if type(line_item) == dict and "data" in line_item.keys():
-                                                for data in line_item["data"]:
-                                                    if data[1] == "stage" and "redraw" in data[2].keys():
-                                                        filename = data[2]["redraw"]["imageFile"]["file"]
-                                                        self.filename_plaintexts.update([
-                                                            f"{filename}.png"
-                                                        ])
+                                                handle_data_block(line_item["data"])
+                                                    
                                             elif type(line_item) == list:
                                                 for item in line_item:
                                                     if type(item) == dict:
-                                                        if item.get("name") == "stage" and "redraw" in item.keys():
-                                                            # 获取背景图片文件名  bgimage
-                                                            filename = item["redraw"]["imageFile"]["file"]
-                                                            self.filename_plaintexts.update([
-                                                                f"{filename}.png"
-                                                            ])
-                                                        elif item.get("name") == "bgm" and "replay" in item.keys():
-                                                            # 获取背景音乐文件名  bgm
-                                                            filename = item["replay"]["filename"]
-                                                            # TODO: 增加全大写或首字母大写
-                                                            if filename is not None:
-                                                                self.filename_plaintexts.update([
-                                                                    f"{filename}.ogg",
-                                                                    f"{filename}.ogg.sli",
-                                                                    f"{filename}.opus",
-                                                                    f"{filename}.opus.sli"
-                                                                ])
-                                                        elif item.get("class") == "msgwin" and "redraw" in item.keys():
-                                                            # 获取人物stand文件名  fgimage
-                                                            filename_withext: str = item["redraw"]["imageFile"]["file"]
-                                                            assert filename_withext.endswith(".stand")
-                                                            self.filename_plaintexts.update([
-                                                                f"{filename_withext}"
-                                                            ])
+                                                        handle_data_item(item)
 
                         elif "height" in psb_json and "width" in psb_json:  # and "layers" in psb_json
                             # pimg psb
@@ -297,7 +347,11 @@ class PlainDict:
                     if not header.startswith("#"):
                         self.filename_plaintexts.update((
                             f"{header}.opus",
-                            f"{header}.opus.sli"
+                            f"{header}.opus.sli",
+                            f"{header}.ogg",
+                            f"{header}.ogg.sli",
+                            f"{header}.mchx",
+                            f"{header}.mchx.sli"
                         ))
         return self
 
@@ -308,6 +362,7 @@ class PlainDict:
     def from_krkrdump_logs(self, krkrdump_dir):
         for filename in os.listdir(krkrdump_dir):
             if all((filename.startswith("KrkrDump-"), filename.endswith(".log"))):
+                print(f"current log: {filename}")
                 filepath = os.path.join(krkrdump_dir, filename)
                 with open(filepath, mode="r", encoding="UTF-8") as log_f:
                     krkrdump_log = log_f.readlines()
