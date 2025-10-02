@@ -107,7 +107,7 @@ class PlainDict:
                         f"{filename}.mchx",
                         f"{filename}.mchx.sli"
                     ])
-            elif data_item.get("name") in ("lse", "lse2") and "replay" in data_item.keys():
+            elif data_item.get("name") in ("lse", "lse2", "se") and "replay" in data_item.keys():
                 # sound
                 filename_raw: str = data_item["replay"]["filename"]
                 if filename_raw is not None:
@@ -126,7 +126,7 @@ class PlainDict:
                 self.filename_plaintexts.update([
                     f"{filename}.png"
                 ])
-            elif data_item.get("class") == "msgwin":
+            elif data_item.get("class") in ("msgwin", "character"):
                 # 获取人物stand文件名  fgimage
                 if "redraw" in data_item.keys():
                     filename_with_ext: str = data_item["redraw"]["imageFile"]["file"]
@@ -155,6 +155,18 @@ class PlainDict:
                     self.filename_plaintexts.add(
                         f"{filename_with_ext}"
                     )
+            elif data_item.get("class") == "phonechat" and data_item.get("name") == "phonescreen" and "redraw" in data_item.keys():
+                # 获取气泡聊天背景图片
+                filename = data_item["redraw"]["imageFile"]["file"]
+                self.filename_plaintexts.add(
+                    f"{filename}.tlg"
+                )
+            elif data_item.get("class") == "sdlayer" and "redraw" in data_item.keys():
+                # sd图层
+                filename = data_item["redraw"]["imageFile"]["file"]
+                self.filename_plaintexts.add(
+                    f"{filename}.png"
+                )
 
         def handle_data_block(data_block: list):
             # lines和texts里某些data字段结构是一致的，因此可以封装成一个共同方法进行处理
@@ -163,6 +175,20 @@ class PlainDict:
                     for data_item in data:
                         if type(data_item) == dict:
                             handle_data_item(data_item)
+                            
+        def handle_voice(voice_name_raw: str):
+            if "|" in voice_name_raw:
+                voice_names = voice_name_raw.split("|")
+            else:
+                voice_names = [voice_name_raw]
+            for voice_name in voice_names:
+                self.filename_plaintexts.update([
+                    f"{voice_name}.ogg",
+                    f"{voice_name}.ogg.sli",
+                    f"{voice_name}.opus",
+                    f"{voice_name}.opus.sli",
+                    f"{voice_name}.ini"
+                ])
                             
         if not os.path.exists(config.psb_type_cache_json):
             open(config.psb_type_cache_json, mode="w", encoding="UTF-8")
@@ -207,25 +233,14 @@ class PlainDict:
                                                     if type(text_item_item) == dict and "voice" in text_item_item.keys():
                                                         # 获取语音文件名  voice
                                                         voice_source = text_item_item
-                                                        voice_name_raw: str = voice_source["voice"]
-                                                        if "|" in voice_name_raw:
-                                                            voice_names = voice_name_raw.split("|")
-                                                        else:
-                                                            voice_names = [voice_name_raw]
-                                                        for voice_name in voice_names:
-                                                            self.filename_plaintexts.update([
-                                                                f"{voice_name}.ogg",
-                                                                f"{voice_name}.ogg.sli",
-                                                                f"{voice_name}.opus",
-                                                                f"{voice_name}.opus.sli",
-                                                                f"{voice_name}.ini"
-                                                            ])     
+                                                        handle_voice(voice_source["voice"])
+                                                             
                                             elif type(text_item) == dict and "data" in text_item.keys():
                                                 handle_data_block(text_item["data"])
 
                                 for line in scene["lines"]:  # 0000
                                     if type(line) == list:
-                                        for line_item in line:
+                                        for index, line_item in enumerate(line):
                                             if type(line_item) == dict and "data" in line_item.keys():
                                                 handle_data_block(line_item["data"])
                                                     
@@ -233,6 +248,12 @@ class PlainDict:
                                                 for item in line_item:
                                                     if type(item) == dict:
                                                         handle_data_item(item)
+                                                        
+                                            elif type(line_item) == str:
+                                                if line[index-1] == "voice":
+                                                    # 某些语音藏在lines的playvoice行中... (e.g. anj_102_0016)
+                                                    handle_voice(line_item)
+                                                
 
                         elif "height" in psb_json and "width" in psb_json:  # and "layers" in psb_json
                             # pimg psb
