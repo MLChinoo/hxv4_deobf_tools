@@ -8,22 +8,21 @@ from utils.move_bomhash_files import get_unique_name, merge_dir
 
 dictionary = (PlainDict(
     pathnames=[
-        "scenario/transitions/"
+        
     ],
     filenames=[
-        "rule_19.png",
         "base.stage",
         "cglist.csv",
         "soundlist.csv",
         "charvoice.csv",
-        "op.mp4",
-        "op720p.wmv",
-        "tougetsu_multi.opus",
-        "pf_moonlight_multi.opus"
+        
+        "chaticon_empty.png",
+
     ]
 )
 # 在这里添加明文字典来源：
               #.from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\3lj_data")
+              #.from_unobfuscated_directory(r"D:\gals\dumps\stella_dumps\uipsd")
               .scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
               #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\base.stage")
               #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\cglist.csv")
@@ -37,7 +36,6 @@ dictionary = (PlainDict(
 path_hash_map = {}
 file_hash_map = {}
 if not os.path.exists("HxNames.lst"):
-    # os.mknod("HxNames.lst")
     open("HxNames.lst", mode="w", encoding="UTF-8")
 with open("HxNames.lst", mode="r", encoding="UTF-8") as h:
     h_lines = h.readlines()

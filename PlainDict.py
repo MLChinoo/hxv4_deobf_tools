@@ -235,8 +235,16 @@ class PlainDict:
                                                         voice_source = text_item_item
                                                         handle_voice(voice_source["voice"])
                                                              
-                                            elif type(text_item) == dict and "data" in text_item.keys():
-                                                handle_data_block(text_item["data"])
+                                            elif type(text_item) == dict:
+                                                if "data" in text_item.keys():
+                                                    handle_data_block(text_item["data"])
+                                                if "phonechat" in text_item.keys():
+                                                    for chat in text_item["phonechat"]:
+                                                        assert type(chat) == dict
+                                                        icon = chat["icon"]
+                                                        self.filename_plaintexts.add(
+                                                            f"chaticon_{icon}.png"
+                                                        )
 
                                 for line in scene["lines"]:  # 0000
                                     if type(line) == list:
