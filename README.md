@@ -1,5 +1,7 @@
 # hxv4_deobf_tools
 
+TODO: 使用JSON Schema重构
+
 **Q1: 这是什么？**
 
 A1: 帮助你还原经hxv4 hash后的文件名的一系列实用脚本，实测反哈希率可达到90%以上。
