@@ -111,10 +111,7 @@ class PlainDict:
                 # sound
                 filename_raw: str = data_item["replay"]["filename"]
                 if filename_raw is not None:
-                    if "|" in filename_raw:
-                        filenames = filename_raw.split("|")
-                    else:
-                        filenames = [filename_raw]
+                    filenames = filename_raw.split("|")
                     for filename in filenames:
                         self.filename_plaintexts.update([
                             f"{filename}.ogg",
@@ -177,10 +174,7 @@ class PlainDict:
                             handle_data_item(data_item)
                             
         def handle_voice(voice_name_raw: str):
-            if "|" in voice_name_raw:
-                voice_names = voice_name_raw.split("|")
-            else:
-                voice_names = [voice_name_raw]
+            voice_names = voice_name_raw.split("|")
             for voice_name in voice_names:
                 self.filename_plaintexts.update([
                     f"{voice_name}.ogg",
@@ -320,47 +314,40 @@ class PlainDict:
         with open(cglist_csv_filepath, mode="r", encoding="utf-16le") as f:
             cglist_csv = csv.reader(f)
             for row in cglist_csv:
-                header = row[0]
-                if header.startswith("thum_"):
-                    # assert len(header) == 10  # thum_EV101, thum_SD001
-                    cg_name = header[5:]  # EV101, SD001
-                    cg_type = cg_name[:2]  # EV, SD
-                    match cg_type.lower():
-                        case "ev":
-                            self.filename_plaintexts.update((
-                                f"{cg_name}a.pimg",
-                                f"{cg_name}b.pimg",
-                                f"{cg_name}mm.pimg",
-                                f"{cg_name}a_censored.pimg",
-                                f"{cg_name}b_censored.pimg",
-                                f"{cg_name}mm_censored.pimg",
-                                f"{cg_name}_a.pimg",
-                                f"{cg_name}_b.pimg",
-                                f"{cg_name}_mm.pimg",
-                                f"{cg_name}_a_censored.pimg",
-                                f"{cg_name}_b_censored.pimg",
-                                f"{cg_name}_mm_censored.pimg",
-                                f"thum_{cg_name}.jpg",
-                                f"thum_{cg_name}.png",
-                                f"thum_{cg_name}_censored.jpg",
-                                f"thum_{cg_name}_censored.png",
-                                f"savethum_{cg_name}.jpg",
-                                f"savethum_{cg_name}.png"
-                            ))
-                        case "sd":
-                            self.filename_plaintexts.update((
-                                f"{cg_name}.mtn",
-                                f"{cg_name}.psb",
-                                f"thum_{cg_name}.jpg",
-                                f"thum_{cg_name}.png"
-                            ))
-                            for cg_diff in row[2:]:
-                                cg_diff = cg_diff.strip()
-                                self.filename_plaintexts.update((
-                                    f"{cg_diff}.jpg",
-                                    f"{cg_diff}.png",
-                                    f"{cg_diff}.asd",
-                                ))
+                cg_filename = row[0].strip()
+                if cg_filename.startswith("#"):
+                    continue
+                if ":" in cg_filename:
+                    print(f"bad cg_filename, ignored: {cg_filename} in {cglist_csv_filepath}")
+                    continue
+                # ev: 
+                self.filename_plaintexts.update([
+                    # ev部分文件名迁移至from_imagediffmap_csv()
+                    f"{cg_filename}.jpg",
+                    f"{cg_filename}.png",
+                    f"{cg_filename}_censored.jpg",
+                    f"{cg_filename}_censored.png",
+                ])
+                if cg_filename.startswith("thum_"):
+                    self.filename_plaintexts.update([
+                        # savethum必定censored
+                        f"save{cg_filename}.jpg",
+                        f"save{cg_filename}.png"
+                    ])
+                # sd: 
+                if cg_filename.startswith("thum_sd"):  # thum_sd001
+                    sd_name = cg_filename[5:]  # sd001
+                    self.filename_plaintexts.update((
+                        f"{sd_name}.mtn",
+                        f"{sd_name}.psb"
+                    ))
+                    for sd_diff in row[1:]:
+                        sd_diff = sd_diff.strip()  # sd001a01
+                        self.filename_plaintexts.update((
+                            f"{sd_diff}.jpg",
+                            f"{sd_diff}.png",
+                            f"{sd_diff}.asd"
+                        ))
         return self
 
     """
@@ -458,6 +445,32 @@ class PlainDict:
                         char_prefix = row[1].split("_")[0]
                         for sys_voice_suffix in sys_voice_suffixes:
                             self.filename_plaintexts.add(f"{char_prefix}_{sys_voice_suffix}.ogg")
+        return self
+
+    """
+    从imagediffmap.csv文件中获取cg文件名evimage
+    需要运行两次脚本
+    """
+    def from_imagediffmap_csv(self, imagediffmap_csv_filepath):
+        with open(imagediffmap_csv_filepath, mode="r", encoding="utf-16le") as f:
+            imagediffmap_csv = csv.reader(f)
+            for row in imagediffmap_csv:
+                if len(row) > 0:
+                    header = row[0].replace("\ufeff", "")  # remove bom
+                    if not header.startswith("#"):
+                        filename = row[1]
+                        if "." in filename:
+                            names, extension = filename.rsplit(".", 1)
+                            names = names.split("|")
+                            for name in names:
+                                self.filename_plaintexts.add(
+                                    f"{name}.{extension}"
+                                )
+                        else:
+                            self.filename_plaintexts.update([
+                                f"{filename}.pimg",
+                                f"{filename}_censored.pimg"
+                            ])
         return self
 
 if __name__ == "__main__":

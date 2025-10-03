@@ -15,19 +15,18 @@ dictionary = (PlainDict(
         "cglist.csv",
         "soundlist.csv",
         "charvoice.csv",
-        
-        "chaticon_empty.png",
-
+        "imagediffmap.csv",
     ]
 )
 # 在这里添加明文字典来源：
               #.from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\3lj_data")
               #.from_unobfuscated_directory(r"D:\gals\dumps\stella_dumps\uipsd")
-              .scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
+              #.scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
               #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\base.stage")
-              #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\cglist.csv")
+              .from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\cglist.csv")
               #.from_soundlist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\soundlist.csv")
               #.add_char_sys_voices(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\charvoice.csv")
+              .from_imagediffmap_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\imagediffmap.csv")
               #.from_krkrdump_logs(r"C:\Users\MLChinoo\Desktop\lllj_krkrdumps")
 # 结束
               .duplicate_lower()
