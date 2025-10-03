@@ -147,7 +147,7 @@ class PlainDict:
                         f"{filename}.png"
                     )
                 elif data_item.get("name") == "bg_voice" and "redraw" in data_item.keys():
-                    # vlist (e.g. bgv007_07_歓声.csv)
+                    # 背景对话文件 bg_voice (e.g. bgv007_07_歓声.csv)
                     filename_with_ext = data_item["redraw"]["imageFile"]["file"]["storage"]
                     self.filename_plaintexts.add(
                         f"{filename_with_ext}"
@@ -285,7 +285,6 @@ class PlainDict:
 
     """
     从base.stage文件中获取背景图片文件名bgimage
-    需要运行两次脚本
     """
     def from_base_stage(self, base_stage_filepath: str):
         with open(base_stage_filepath, mode="r", encoding="utf-16le") as f:
@@ -308,7 +307,6 @@ class PlainDict:
 
     """
     从cglist.csv文件中获取cg文件名evimage和sd
-    需要运行两次脚本
     """
     def from_cglist_csv(self, cglist_csv_filepath: str):
         with open(cglist_csv_filepath, mode="r", encoding="utf-16le") as f:
@@ -352,7 +350,6 @@ class PlainDict:
 
     """
     从soundlist.csv文件中获取bgm文件名
-    需要运行两次脚本
     """
     def from_soundlist_csv(self, soundlist_csv_filepath):
         with open(soundlist_csv_filepath, mode="r", encoding="utf-16le") as f:
@@ -449,7 +446,6 @@ class PlainDict:
 
     """
     从imagediffmap.csv文件中获取cg文件名evimage
-    需要运行两次脚本
     """
     def from_imagediffmap_csv(self, imagediffmap_csv_filepath):
         with open(imagediffmap_csv_filepath, mode="r", encoding="utf-16le") as f:
@@ -470,6 +466,29 @@ class PlainDict:
                             self.filename_plaintexts.update([
                                 f"{filename}.pimg",
                                 f"{filename}_censored.pimg"
+                            ])
+        return self
+    
+    """
+    从背景对话文件 (e.g. bgv102_02_恵凪会話.csv) 中获取语音文件名
+    此文件名分布在各个scn中，因此需先跑一遍scan_psb_and_decompile()
+    此文件一般位于voice包中，因此需指定跑过一遍脚本后的voice文件夹
+    """
+    def from_bgv_csv(self, voice_dir):
+        for child in Path(voice_dir).iterdir():
+            # 假设文件名以bgv开头，扩展名为.csv
+            if all([child.is_file(), child.stem.startswith("bgv"), child.suffix == ".csv"]):
+                with open(child, mode="r", encoding="utf-16le") as f:
+                    bgv_csv = csv.reader(f)
+                    for row in bgv_csv:
+                        if len(row) > 0 and not row[0].replace("\ufeff", "").startswith("#"):
+                            voice_name = row[2]
+                            self.filename_plaintexts.update([
+                                f"{voice_name}.ogg",
+                                f"{voice_name}.ogg.sli",
+                                f"{voice_name}.opus",
+                                f"{voice_name}.opus.sli",
+                                f"{voice_name}.ini"
                             ])
         return self
 
