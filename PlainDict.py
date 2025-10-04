@@ -180,19 +180,23 @@ class PlainDict:
                         if type(data_item) == dict:
                             handle_data_item(data_item)
                             
-        def handle_voice(voice_filename: str):  # ena_01|ena_02.ogg.sli
-            voice_extensions = {"ogg", "ogg.sli", "opus", "opus.sli", "ini"}
-            voice_name_raw = voice_filename
-            if "." in voice_filename:
-                if voice_filename.count(".") > 1:
-                    print(f"warning: multiple extensions file - {voice_filename}")
-                voice_name_raw, extension = voice_filename.split(".", 1)
-                voice_extensions.add(extension)
-            voice_names = voice_name_raw.split("|")
-            for voice_name, voice_extension in product(voice_names, voice_extensions):
-                self.filename_plaintexts.add(
-                    f"{voice_name}.{voice_extension}"
-                )
+        def handle_voice(voice_filenames_raw: str):  # fanB_412_0012.ogg|DL_回想
+            base_voice_extensions = {"ogg", "ogg.sli", "opus", "opus.sli", "ini"}
+            voice_filenames = voice_filenames_raw.split("|")
+            for voice_filename in voice_filenames:
+                if "." in voice_filename:
+                    if voice_filename.count(".") > 1:
+                        print(f"warning: multiple extensions file - {voice_filename}")
+                    voice_name, extension = voice_filename.split(".", 1)
+                else:
+                    voice_name, extension = voice_filename, None
+                voice_extensions = base_voice_extensions.copy()
+                if extension is not None:
+                    voice_extensions.add(extension)
+                for voice_extension in voice_extensions:
+                    self.filename_plaintexts.add(
+                        f"{voice_name}.{voice_extension}"
+                    )
                             
         if not os.path.exists(config.psb_type_cache_json):
             open(config.psb_type_cache_json, mode="w", encoding="UTF-8")
