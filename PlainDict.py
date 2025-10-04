@@ -173,16 +173,20 @@ class PlainDict:
                         if type(data_item) == dict:
                             handle_data_item(data_item)
                             
-        def handle_voice(voice_name_raw: str):
+        def handle_voice(voice_filename: str):  # ena_01|ena_02.ogg.sli
+            voice_extensions = {"ogg", "ogg.sli", "opus", "opus.sli", "ini"}
+            voice_name_raw = voice_filename
+            if "." in voice_filename:
+                if voice_filename.count(".") > 1:
+                    print(f"warning: multiple extensions file - {voice_filename}")
+                voice_name_raw, extension = voice_filename.split(".", 1)
+                voice_extensions.add(extension)
             voice_names = voice_name_raw.split("|")
             for voice_name in voice_names:
-                self.filename_plaintexts.update([
-                    f"{voice_name}.ogg",
-                    f"{voice_name}.ogg.sli",
-                    f"{voice_name}.opus",
-                    f"{voice_name}.opus.sli",
-                    f"{voice_name}.ini"
-                ])
+                for voice_extension in voice_extensions:
+                    self.filename_plaintexts.add(
+                        f"{voice_name}.{voice_extension}"
+                    )
                             
         if not os.path.exists(config.psb_type_cache_json):
             open(config.psb_type_cache_json, mode="w", encoding="UTF-8")
@@ -456,7 +460,9 @@ class PlainDict:
                     if not header.startswith("#"):
                         filename = row[1]
                         if "." in filename:
-                            names, extension = filename.rsplit(".", 1)
+                            if filename.count(".") > 1:
+                                print(f"warning: multiple extensions file - {filename}")
+                            names, extension = filename.split(".", 1)
                             names = names.split("|")
                             for name in names:
                                 self.filename_plaintexts.add(
