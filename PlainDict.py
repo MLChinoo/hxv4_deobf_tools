@@ -5,6 +5,7 @@ import re
 import shutil
 import subprocess
 import traceback
+from itertools import product
 from json import JSONDecodeError
 from pathlib import Path
 from contextlib import suppress
@@ -188,11 +189,10 @@ class PlainDict:
                 voice_name_raw, extension = voice_filename.split(".", 1)
                 voice_extensions.add(extension)
             voice_names = voice_name_raw.split("|")
-            for voice_name in voice_names:
-                for voice_extension in voice_extensions:
-                    self.filename_plaintexts.add(
-                        f"{voice_name}.{voice_extension}"
-                    )
+            for voice_name, voice_extension in product(voice_names, voice_extensions):
+                self.filename_plaintexts.add(
+                    f"{voice_name}.{voice_extension}"
+                )
                             
         if not os.path.exists(config.psb_type_cache_json):
             open(config.psb_type_cache_json, mode="w", encoding="UTF-8")
@@ -299,20 +299,25 @@ class PlainDict:
     def from_base_stage(self, base_stage_filepath: str):
         with open(base_stage_filepath, mode="r", encoding="utf-16le") as f:
             base_stage: dict = json5.loads(parse_base_stage_to_json5(f.read()))
-        prefixes = set()
+        time_prefixes, season_prefixes = set(), set()
         for key, value in base_stage.items():
             if type(value) == dict:
                 if key == "times":
-                    for time in base_stage["times"].values():
-                        prefixes.add(time.get("prefix"))
+                    for time in value.values():
+                        time_prefixes.add(time.get("prefix"))
+                elif key == "seasons":
+                    for season in value.values():
+                        season_prefixes.add(season.get("prefix"))
                 elif key != "stages":
-                    prefixes.add(base_stage[key].get("prefix"))
+                    pass  # unknown classification...?
         for stage in base_stage["stages"].values():
             image_file_string: str = stage["image"]
-            for prefix in prefixes:
-                if prefix is not None:
-                    image_file = image_file_string.replace("TIME", prefix)
-                    self.filename_plaintexts.add(f"{image_file}.png")
+            for time_prefix, season_prefix in product(time_prefixes, season_prefixes):
+                if all((time_prefix is not None, season_prefix is not None)):
+                    image_filename = (image_file_string
+                                  .replace("TIME", time_prefix)
+                                  .replace("SEASON", season_prefix))
+                    self.filename_plaintexts.add(f"{image_filename}.png")
         return self
 
     """

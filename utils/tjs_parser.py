@@ -69,7 +69,7 @@ def parse_base_stage_to_json5(src: str) -> str:
 
 
 if __name__ == "__main__":
-    with open(r"C:\Users\MLChinoo\Desktop\tenshi_hikari_dumps\data\bgimage\base.stage", mode="r", encoding="UTF-16") as file:
+    with open(r"C:\Users\MLChinoo\Desktop\3lj_data_full\bgimage\base.stage", mode="r", encoding="UTF-16") as file:
         raw = file.read()
     converted = parse_base_stage_to_json5(raw)
     print(converted)
