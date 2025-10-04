@@ -164,6 +164,12 @@ class PlainDict:
                 self.filename_plaintexts.add(
                     f"{filename}.png"
                 )
+            elif data_item.get("class") == "event2" and "redraw" in data_item.keys():
+                # 
+                filename = data_item["redraw"]["clip"]["image"]
+                self.filename_plaintexts.add(
+                    f"{filename}.png"
+                )
 
         def handle_data_block(data_block: list):
             # lines和texts里某些data字段结构是一致的，因此可以封装成一个共同方法进行处理
