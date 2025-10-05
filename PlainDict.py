@@ -140,9 +140,7 @@ class PlainDict:
                     )
             elif data_item.get("class") == "event":
                 if data_item.get("name") == "ev" and "redraw" in data_item.keys():
-                    # 1.在texts中获取cg文件名 evimage
-                    # from_cglist_csv()已实现此来源 故略
-                    # 2.在lines中获取image
+                    # 在lines中获取image
                     filename = data_item["redraw"]["imageFile"]["file"]
                     self.filename_plaintexts.add(
                         f"{filename}.png"
@@ -325,7 +323,7 @@ class PlainDict:
         return self
 
     """
-    从cglist.csv文件中获取cg文件名evimage和sd
+    从cglist.csv文件中获取cg缩略图thum及sd文件
     """
     def from_cglist_csv(self, cglist_csv_filepath: str):
         with open(cglist_csv_filepath, mode="r", encoding="utf-16le") as f:
@@ -337,6 +335,7 @@ class PlainDict:
                 if ":" in cg_filename:
                     print(f"bad cg_filename, ignored: {cg_filename} in {cglist_csv_filepath}")
                     continue
+                cg_name = cg_filename.replace("thum_", "")
                 # ev: 
                 self.filename_plaintexts.update([
                     # ev部分文件名迁移至from_imagediffmap_csv()
@@ -351,6 +350,26 @@ class PlainDict:
                         f"save{cg_filename}.jpg",
                         f"save{cg_filename}.png"
                     ])
+                if cg_filename.startswith("thum_ev"):
+                    for cg_diffs in row[1:]:
+                        for cg_diff in cg_diffs.replace("*", "").split("|"):
+                            if not cg_diff.startswith(cg_name):
+                                print(f"bad cg_diff with cg_name, ignored: {cg_diff}, {cg_name}")
+                                continue
+                            cg_name_last_pos = cg_diff.find(cg_name) + len(cg_name)
+                            for cg_diff_last_pos in range(cg_name_last_pos, len(cg_diff)+1):
+                                filename = f"{cg_name}{cg_diff[cg_name_last_pos:cg_diff_last_pos]}"
+                                self.filename_plaintexts.update([
+                                    f"{filename}.pimg",
+                                    f"{filename}_censored.pimg",
+                                    f"thum_{filename}.png",
+                                    f"thum_{filename}.jpg",
+                                    f"thum_{filename}_censored.png",
+                                    f"thum_{filename}_censored.jpg",
+                                    f"savethum_{filename}.png",
+                                    f"savethum_{filename}.jpg",
+                                ])
+                            
                 # sd: 
                 if cg_filename.startswith("thum_sd"):  # thum_sd001
                     sd_name = cg_filename[5:]  # sd001
@@ -486,7 +505,9 @@ class PlainDict:
                         else:
                             self.filename_plaintexts.update([
                                 f"{filename}.pimg",
-                                f"{filename}_censored.pimg"
+                                f"{filename}_censored.pimg",
+                                f"savethum_{filename}.jpg",
+                                f"savethum_{filename}.png"
                             ])
         return self
     
@@ -512,7 +533,50 @@ class PlainDict:
                                 f"{voice_name}.ini"
                             ])
         return self
-
+    
+    """
+    从savelist.csv文件中获取存档图片savethum
+    """
+    def from_savelist_csv(self, savelist_csv_filepath):
+        with open(savelist_csv_filepath, mode="r", encoding="utf-16le") as f:
+            savelist_csv = csv.reader(f)
+            for row in savelist_csv:
+                if len(row) > 0:
+                    header = row[0].replace("\ufeff", "")  # remove bom
+                    if not header.startswith("#"):
+                        filename = row[0]
+                        self.filename_plaintexts.update([
+                            f"{filename}.jpg",
+                            f"{filename}.png",
+                            f"{filename.replace("savethum_", "thum_")}.jpg",
+                            f"{filename.replace("savethum_", "thum_")}.png",
+                        ])
+        return self
+    
+    """
+    从scenelist.csv中获取cg缩略图thum
+    此来源可以获取到影片movie缩略图movthum
+    """
+    def from_scenelist_csv(self, scenelist_csv_filepath):
+        with open(scenelist_csv_filepath, mode="r", encoding="utf-16le") as f:
+            scenelist_csv = csv.reader(f)
+            for row in scenelist_csv:
+                if len(row) > 0:
+                    header = row[0].replace("\ufeff", "")  # remove bom
+                    if not header.startswith("#"):
+                        if ":" in header:
+                            print(f"bad cg_filename, ignored: {header} in {scenelist_csv_filepath}")
+                            continue
+                        filenames = row[0].split("|")
+                        for filename in filenames:
+                            self.filename_plaintexts.update([
+                                f"{filename}.jpg",
+                                f"{filename}.png",
+                                f"{filename}_censored.jpg",
+                                f"{filename}_censored.png"
+                            ])
+        return self
+                            
 if __name__ == "__main__":
     for root, dirs, files in os.walk(config.temp_dir):
         for d in dirs:
