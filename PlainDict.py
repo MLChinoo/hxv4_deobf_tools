@@ -9,6 +9,7 @@ from itertools import product
 from json import JSONDecodeError
 from pathlib import Path
 from contextlib import suppress
+from collections.abc import Iterable
 
 import json5
 
@@ -575,6 +576,34 @@ class PlainDict:
                                 f"{filename}_censored.jpg",
                                 f"{filename}_censored.png"
                             ])
+        return self
+    
+    """
+    寻找可能遗漏的语音文件
+    某些语音存在于voice目录中，但未被任何scn引用，根本不可能在正常游戏流程中出现（即“废案语音”，例如宁宁有30个左右），
+    这时即可利用语音文件名编号连续的特点，来尽可能寻找这些语音。
+    """
+    def find_missing_voices(self, voice_dirs: Iterable):
+        prefix_maxnum_map = {}  # anj_000: 90
+        for voice_dir in voice_dirs:
+            for child in Path(voice_dir).iterdir():
+                if all((child.is_file(), child.suffix in (".ogg", ".sli"), child.stem.count("_") == 2)):  # anj_000_0090.ogg
+                    prefix, num = child.stem.rsplit("_", 1)  # anj_000, 0090
+                    if result := re.match(r'^(\d{4})', num):
+                        num = int(result.group(1))  # 90
+                        if prefix not in prefix_maxnum_map:
+                            prefix_maxnum_map[prefix] = 1
+                        if num > prefix_maxnum_map[prefix]:
+                            prefix_maxnum_map[prefix] = num
+        for prefix, maxnum in prefix_maxnum_map.items():
+            for num in range(1, maxnum+1):
+                voice_name = f"{prefix}_{num:04d}"
+                if not any(((Path(vd) / f"{voice_name}.ogg").exists() for vd in voice_dirs)):
+                    print(f"found possible missing voice: {voice_name}")
+                    self.filename_plaintexts.update([
+                        f"{voice_name}.ogg",
+                        f"{voice_name}.ogg.sli"
+                    ])
         return self
                             
 if __name__ == "__main__":

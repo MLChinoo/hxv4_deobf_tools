@@ -24,7 +24,7 @@ dictionary = (PlainDict(
               #.from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\3lj_data")
               #.from_unobfuscated_directory(r"D:\gals\dumps\stella_dumps\uipsd")
               #.scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
-              .from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\bgimage\base.stage")
+              #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\bgimage\base.stage")
               #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\cglist.csv")
               #.from_soundlist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\soundlist.csv")
               #.add_char_sys_voices(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\charvoice.csv")
@@ -33,6 +33,10 @@ dictionary = (PlainDict(
               #.from_savelist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\savelist.csv")
               #.from_scenelist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\scenelist.csv")
               #.from_krkrdump_logs(r"C:\Users\MLChinoo\Desktop\lllj_krkrdumps")
+              .find_missing_voices([
+                  r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice",
+                  r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice2"
+              ])
 # 结束
               .duplicate_lower()
               )
