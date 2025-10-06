@@ -7,14 +7,14 @@ from pathlib import Path
 from utils.check_hash import is_name_hash, is_path_hash
 
 
-def generate_clean_hxnames(deobfuscated_dir: Path, save_filepath: Path):
+def generate_clean_hxnames(base_hxnames_filepath: Path, deobfuscated_dir: Path, save_filepath: Path):
     path_hash_map = {}
     file_hash_map = {}
     save_file = open(save_filepath, mode="w", encoding="UTF-8")
     saved_items = set()
     ignored_items = 0
 
-    with open("../HxNames.lst", mode="r", encoding="UTF-8") as h:
+    with open(base_hxnames_filepath, mode="r", encoding="UTF-8") as h:
         h_lines = h.readlines()
         for line in h_lines:
             if line.strip() == "":
@@ -63,6 +63,7 @@ def generate_clean_hxnames(deobfuscated_dir: Path, save_filepath: Path):
 
 if __name__ == "__main__":
     generate_clean_hxnames(
+        base_hxnames_filepath=Path(r"C:\Users\MLChinoo\PycharmProjects\hxv4_deobf_tools\HxNames.lst"),
         deobfuscated_dir=Path(r"C:\Users\MLChinoo\Desktop\3lj_data_full"),
         save_filepath=Path(r"C:\Users\MLChinoo\PycharmProjects\hxv4_deobf_tools\HxNames-LLLJ.lst")
     )
