@@ -18,6 +18,9 @@ def get_progress_percent(root_dir: str) -> float:
             if is_path_hash(d):
                 hashed_path += 1
         for file in files:
+            if file == "2EA4AAEC6A09F9D17E2A5A7AC422FB64B6A42195C55CF6772FB30C0FA0120C8D":
+                # 未知文件，与游戏无关，疑似为GARbro提取时的bug
+                continue
             total_file += 1
             if is_name_hash(file):
                 hashed_file += 1
