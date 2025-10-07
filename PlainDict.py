@@ -109,7 +109,7 @@ class PlainDict:
                         f"{filename}.mchx",
                         f"{filename}.mchx.sli"
                     ])
-            elif data_item.get("name") in ("lse", "lse2", "se") and "replay" in data_item.keys():
+            elif data_item.get("name") in ("lse", "lse2", "se", "se2") and "replay" in data_item.keys():
                 # sound
                 filename_raw: str = data_item["replay"]["filename"]
                 if filename_raw is not None:
@@ -337,20 +337,23 @@ class PlainDict:
                     print(f"bad cg_filename, ignored: {cg_filename} in {cglist_csv_filepath}")
                     continue
                 cg_name = cg_filename.replace("thum_", "")
-                # ev: 
                 self.filename_plaintexts.update([
                     # ev部分文件名迁移至from_imagediffmap_csv()
                     f"{cg_filename}.jpg",
                     f"{cg_filename}.png",
                     f"{cg_filename}_censored.jpg",
                     f"{cg_filename}_censored.png",
+                    f"{cg_filename}.psb",
+                    f"{cg_filename}_censored.psb"
                 ])
                 if cg_filename.startswith("thum_"):
                     self.filename_plaintexts.update([
                         # savethum必定censored
                         f"save{cg_filename}.jpg",
-                        f"save{cg_filename}.png"
+                        f"save{cg_filename}.png",
+                        f"save{cg_filename}.psb"
                     ])
+                # ev: 
                 if cg_filename.startswith("thum_ev"):
                     for cg_diffs in row[1:]:
                         for cg_diff in cg_diffs.replace("*", "").split("|"):
@@ -369,8 +372,12 @@ class PlainDict:
                                     f"thum_{filename}_censored.jpg",
                                     f"savethum_{filename}.png",
                                     f"savethum_{filename}.jpg",
+                                    f"{filename}.psb",
+                                    f"{filename}_censored.psb",
+                                    f"thum_{filename}.psb",
+                                    f"thum_{filename}_censored.psb",
+                                    f"savethum_{filename}.psb",
                                 ])
-                            
                 # sd: 
                 if cg_filename.startswith("thum_sd"):  # thum_sd001
                     sd_name = cg_filename[5:]  # sd001
@@ -383,7 +390,8 @@ class PlainDict:
                         self.filename_plaintexts.update((
                             f"{sd_diff}.jpg",
                             f"{sd_diff}.png",
-                            f"{sd_diff}.asd"
+                            f"{sd_diff}.asd",
+                            f"{sd_diff}.psb"
                         ))
         return self
 
@@ -508,7 +516,10 @@ class PlainDict:
                                 f"{filename}.pimg",
                                 f"{filename}_censored.pimg",
                                 f"savethum_{filename}.jpg",
-                                f"savethum_{filename}.png"
+                                f"savethum_{filename}.png",
+                                f"{filename}.psb",
+                                f"{filename}_censored.psb",
+                                f"savethum_{filename}.psb",
                             ])
         return self
     
@@ -551,6 +562,8 @@ class PlainDict:
                             f"{filename}.png",
                             f"{filename.replace("savethum_", "thum_")}.jpg",
                             f"{filename.replace("savethum_", "thum_")}.png",
+                            f"{filename}.psb",
+                            f"{filename.replace("savethum_", "thum_")}.psb"
                         ])
         return self
     
@@ -574,7 +587,9 @@ class PlainDict:
                                 f"{filename}.jpg",
                                 f"{filename}.png",
                                 f"{filename}_censored.jpg",
-                                f"{filename}_censored.png"
+                                f"{filename}_censored.png",
+                                f"{filename}.psb",
+                                f"{filename}_censored.psb",
                             ])
         return self
     
@@ -604,6 +619,32 @@ class PlainDict:
                         f"{voice_name}.ogg",
                         f"{voice_name}.ogg.sli"
                     ])
+        return self
+    
+    """
+    从replay.ks获取影片文件名video
+    实际上macro.ks也存在影片（如nene_change和tsumu_change），但数量极少故暂不处理
+    同时保留命名为add_movies而不是from_replay_ks
+    """
+    def add_movies(self, replay_ks_filepath):
+        movie_names = ["op"]
+        languages = ("en", "cn", "tw")  # 日语无前缀
+        extensions = ("mp4", "wmv")
+        pattern = r'\[(?:sysmovie|edmovie)\s+file=([^\s\]]+)\s*\]'
+        with open(replay_ks_filepath, mode="r", encoding="utf-16le") as f:
+            replay_ks = f.read().replace("\ufeff", "")
+            movie_names.extend(re.findall(pattern, replay_ks))
+        for movie_name, language, extension in product(movie_names, languages, extensions):
+            self.filename_plaintexts.update([
+                f"{movie_name}.{extension}",
+                f"{language}_{movie_name}.{extension}",
+                f"{movie_name}1080.{extension}",
+                f"{language}_{movie_name}1080.{extension}",
+                f"{movie_name}_1080.{extension}",
+                f"{language}_{movie_name}_1080.{extension}",
+                f"{movie_name}720p.{extension}",
+                f"{language}_{movie_name}720p.{extension}",
+            ])
         return self
                             
 if __name__ == "__main__":

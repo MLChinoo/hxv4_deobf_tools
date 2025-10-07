@@ -18,6 +18,7 @@ dictionary = (PlainDict(
         "imagediffmap.csv",
         "savelist.csv",
         "scenelist.csv",
+        "replay.ks"
     ]
 )
 # 在这里添加明文字典来源：
@@ -33,10 +34,11 @@ dictionary = (PlainDict(
               #.from_savelist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\savelist.csv")
               #.from_scenelist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\scenelist.csv")
               #.from_krkrdump_logs(r"C:\Users\MLChinoo\Desktop\lllj_krkrdumps")
-              .find_missing_voices([
-                  r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice",
-                  r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice2"
-              ])
+              #.find_missing_voices([
+              #    r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice",
+              #    r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice2"
+              #])
+              .add_movies(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\scenario\replay.ks")
 # 结束
               .duplicate_lower()
               )
