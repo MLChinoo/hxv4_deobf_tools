@@ -24,7 +24,7 @@ dictionary = (PlainDict(
 # 在这里添加明文字典来源：
               #.from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\3lj_data")
               #.from_unobfuscated_directory(r"D:\gals\dumps\stella_dumps\uipsd")
-              #.scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
+              .scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
               #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\bgimage\base.stage")
               #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\cglist.csv")
               #.from_soundlist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\soundlist.csv")
@@ -38,7 +38,7 @@ dictionary = (PlainDict(
               #    r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice",
               #    r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice2"
               #])
-              .add_movies(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\scenario\replay.ks")
+              #.add_movies(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\scenario\replay.ks")
 # 结束
               .duplicate_lower()
               )

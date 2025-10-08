@@ -127,18 +127,23 @@ class PlainDict:
                 ])
             elif data_item.get("class") in ("msgwin", "character"):
                 # 获取人物stand文件名  fgimage
+                standname_with_ext = None
                 if "redraw" in data_item.keys():
-                    filename_with_ext: str = data_item["redraw"]["imageFile"]["file"]
-                    assert filename_with_ext.endswith(".stand")
-                    self.filename_plaintexts.add(
-                        f"{filename_with_ext}"
-                    )
+                    standname_with_ext = data_item["redraw"]["imageFile"]["file"]
+                    if "clip" in data_item["redraw"].keys():
+                        imagename = data_item["redraw"]["clip"]["image"]
+                        self.filename_plaintexts.add(
+                            f"{imagename}.png"
+                        )
                 elif "stand" in data_item.keys():
-                    filename_with_ext: str = data_item["stand"]["file"]
-                    assert filename_with_ext.endswith(".stand")
-                    self.filename_plaintexts.add(
-                        f"{filename_with_ext}"
-                    )
+                    standname_with_ext = data_item["stand"]["file"]
+                if type(standname_with_ext) == str:
+                    if standname_with_ext.endswith(".stand"):
+                        self.filename_plaintexts.add(
+                            f"{standname_with_ext}"
+                        )
+                    else:
+                        print(f"bad stand name, ignored: {standname_with_ext}")
             elif data_item.get("class") == "event":
                 if data_item.get("name") == "ev" and "redraw" in data_item.keys():
                     # 在lines中获取image
@@ -164,12 +169,17 @@ class PlainDict:
                 self.filename_plaintexts.add(
                     f"{filename}.png"
                 )
-            elif data_item.get("class") == "event2" and "redraw" in data_item.keys():
-                # 
-                filename = data_item["redraw"]["clip"]["image"]
-                self.filename_plaintexts.add(
-                    f"{filename}.png"
-                )
+            elif data_item.get("class") in ("event2", "stage2") and "redraw" in data_item.keys():
+                # image
+                filename = None
+                if "clip" in data_item["redraw"].keys():
+                    filename = data_item["redraw"]["clip"]["image"]
+                elif "imageFile" in data_item["redraw"].keys():
+                    filename = data_item["redraw"]["imageFile"]["file"]
+                if filename is not None: 
+                    self.filename_plaintexts.add(
+                        f"{filename}.png"
+                    )
 
         def handle_data_block(data_block: list):
             # lines和texts里某些data字段结构是一致的，因此可以封装成一个共同方法进行处理
