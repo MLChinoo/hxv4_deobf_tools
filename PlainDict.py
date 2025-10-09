@@ -656,6 +656,55 @@ class PlainDict:
                 f"{language}_{movie_name}720p.{extension}",
             ])
         return self
+    
+    """
+    从给定的fgimage目录下查找人物.stand文件，并获取.pbd文件名和.sinfo文件名
+    需要先扫描一遍psb来获取.stand文件
+    """
+    def from_stand_files(self, fgimage_dir):
+        for child in Path(fgimage_dir).iterdir():
+            if all((child.is_file(), child.suffix == ".stand")):
+                with open(child, mode="r", encoding="utf-16le") as cf:
+                    filenames = re.findall(r"filename:'([^']+)'", cf.read())
+                    for filename in filenames:
+                        self.filename_plaintexts.update([
+                            f"{filename}.pbd",
+                            f"{filename}.sinfo",
+                            f"{filename}_0.pbd",
+                            f"{filename}_0.sinfo"
+                        ])
+        return self
+    
+    """
+    从给定的fgimage目录下查找人物.pbd文件，并获取人物立绘.tlg文件名
+    需要先从from_stand_files()来源获取.pbd文件
+    """
+    def from_pbd_files(self, fgimage_dir):
+        def is_valid_pbd(child: Path):
+            if not (child.is_file() and child.suffix == ".pbd"):
+                return False
+            with open(child, "rb") as f:
+                return f.read(7) == b"TJS/4s0"
+            
+        for child in Path(fgimage_dir).iterdir():
+            if is_valid_pbd(child):
+                character_prefix = child.stem
+                try:
+                    cmd_result = subprocess.run([config.pbd2json_exe, child.absolute()], capture_output=True, text=True, check=True)
+                    if cmd_result.stdout != "":
+                        pbd_json = json.loads(cmd_result.stdout)
+                        assert type(pbd_json) == list
+                        for pbd_item in pbd_json:
+                            if type(pbd_item) == dict and "layer_id" in pbd_item.keys():
+                                self.filename_plaintexts.add(
+                                    f"{character_prefix}_{pbd_item["layer_id"]}.tlg"
+                                )
+                    else:
+                        raise RuntimeError(f"failed to convert pbd to json: {child}")
+                except Exception:
+                    traceback.print_exc()
+                        
+        return self
                             
 if __name__ == "__main__":
     for root, dirs, files in os.walk(config.temp_dir):

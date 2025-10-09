@@ -11,11 +11,14 @@ A2: 支持从hxv4 crypted游戏（举例：魔女的夜宴 Steam版、星光咖�
 - 目录结构
 - 场景文件（scn）
 - 语音文件（voice）
+- 音效文件（sound）
 - 背景图片文件（bgimage）
 - 背景音乐文件（bgm）
 - 静态cg文件（evimage）
 - 动态cg文件（sd）
-- [WIP]人物立绘文件（fgimage）
+- 人物立绘文件（fgimage）
+- 视频文件（video）
+- …………
 
 **Q3: 如何使用？**
 
@@ -35,6 +38,8 @@ A3: 使用如下，请自行尝试：
 
    `psbdecompile_exe: PsbDecompile.exe文件路径，此文件已随附在项目中`
 
+   `pbd2json_exe: pbd2json.exe文件路径，此文件已随附在项目中`
+
 4. 在main.py开头处添加明文字典来源，具体使用方法可参照main.py及PlainDict.py中的注释
 
 5. 将随附的krkr_hxv4_dumphash.dll重命名为version.dll，并放置在游戏目录下，与游戏可执行文件同一目录
@@ -52,7 +57,8 @@ A3: 使用如下，请自行尝试：
 
 - [UlyssesWu/FreeMote](https://github.com/UlyssesWu/FreeMote)
 - [YuriSizuku/GalgameReverse](https://github.com/YuriSizuku/GalgameReverse)
-- [crskycode/GARbro](https://github.com/crskycode/GARbro)
+- [~~crskycode/GARbro~~](https://github.com/crskycode/GARbro)（已被删除，[Fork](https://github.com/MLChinoo/GARbro)）
 - [YeLikesss/KrkrExtractForCxdecV2](https://github.com/YeLikesss/KrkrExtractForCxdecV2)
-- [crskycode/KrkrDump](https://github.com/crskycode/KrkrDump)
+- [~~crskycode/KrkrDump~~](https://github.com/crskycode/KrkrDump)（已被删除，[Fork](https://github.com/MLChinoo/KrkrDump-Hasher)）
 - [UserUnknownFactor/GARbro2](https://github.com/UserUnknownFactor/GARbro2)
+- [lictex/atri-composite](https://github.com/lictex/atri-composite)
