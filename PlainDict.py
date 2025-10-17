@@ -123,7 +123,8 @@ class PlainDict:
                 # 获取背景图片文件名  bgimage
                 filename = data_item["redraw"]["imageFile"]["file"]
                 self.filename_plaintexts.update([
-                    f"{filename}.png"
+                    f"{filename}.png",
+                    f"bgthum_{filename}.jpg"
                 ])
             elif data_item.get("class") in ("msgwin", "character"):
                 # 获取人物stand文件名  fgimage
@@ -330,7 +331,10 @@ class PlainDict:
                     image_filename = (image_filename_template
                                       .replace("TIME", time_prefix)
                                       .replace("SEASON", season_prefix))
-                    self.filename_plaintexts.add(f"{image_filename}.png")
+                    self.filename_plaintexts.update([
+                        f"{image_filename}.png",
+                        f"bgthum_{image_filename}.jpg"
+                    ])
         return self
 
     """
