@@ -18,31 +18,32 @@ dictionary = (PlainDict(
         "imagediffmap.csv",
         "savelist.csv",
         "scenelist.csv",
-        "replay.ks"
+        "replay.ks",
+        "_chthum_index.pbd"
     ]
 )
 # 在这里添加明文字典来源：
               #.from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\3lj_data")
               #.from_unobfuscated_directory(r"D:\gals\dumps\stella_dumps\uipsd")
-              #.scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
-              #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\bgimage\base.stage")
+              #.scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch")
+              #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\base.stage")
               #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\cglist.csv")
               #.from_soundlist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\soundlist.csv")
               #.add_char_sys_voices(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\charvoice.csv")
-              #.from_imagediffmap_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\imagediffmap.csv")
+              #.from_imagediffmap_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\imagediffmap.csv")
               #.from_bgv_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice")
               #.from_savelist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\savelist.csv")
               #.from_scenelist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\scenelist.csv")
-              #.from_krkrdump_logs(r"Z:\游戏存档\lllj krkrdump")
+              .from_krkrdump_logs(r"C:\Users\MLChinoo\Desktop\krkrdump")
               #.find_missing_voices([
               #    r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice",
-              #    r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice2"
+              #    r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice2",
+              #    r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch"
               #])
               #.add_movies(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\scenario\replay.ks")
-              .from_stand_files(r"C:\Users\MLChinoo\Desktop\3lj_data_full\fgimage")
-              .from_stand_files(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch")
+              #.from_stand_files(r"C:\Users\MLChinoo\Desktop\3lj_data_full\fgimage")
               #.from_pbd_files(r"C:\Users\MLChinoo\Desktop\3lj_data_full\fgimage")
-              #.from_pbd_files(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch")
+              #.from_chthum_index_pbd(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\thum\chthum\_chthum_index.pbd")
 # 结束
               .duplicate_lower()
               )
