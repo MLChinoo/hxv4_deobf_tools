@@ -6,7 +6,7 @@ import os
 
 # ==========在这里更改==========
 
-rename_dir = r"C:\Users\MLChinoo\Desktop\data_test"
+rename_dir = r"C:\Users\MLChinoo\Desktop\3lj_data_full"
 
 psbdecompile_exe = r"C:\Users\MLChinoo\PycharmProjects\hxv4_deobf_tools\psbdecompile\PsbDecompile.exe"
 

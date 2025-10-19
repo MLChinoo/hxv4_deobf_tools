@@ -117,7 +117,8 @@ class PlainDict:
                     for filename in filenames:
                         self.filename_plaintexts.update([
                             f"{filename}.ogg",
-                            f"{filename}.ogg.sli"
+                            f"{filename}.ogg.sli",
+                            f"{filename}.ini"
                         ])
             elif data_item.get("name") == "stage" and "redraw" in data_item.keys():
                 # 获取背景图片文件名  bgimage
@@ -204,9 +205,9 @@ class PlainDict:
                 if extension is not None:
                     voice_extensions.add(extension)
                 for voice_extension in voice_extensions:
-                    self.filename_plaintexts.add(
+                    self.filename_plaintexts.update([
                         f"{voice_name}.{voice_extension}"
-                    )
+                    ])
                             
         if not os.path.exists(config.psb_type_cache_json):
             open(config.psb_type_cache_json, mode="w", encoding="UTF-8")
@@ -262,6 +263,10 @@ class PlainDict:
                                                         icon = chat["icon"]
                                                         self.filename_plaintexts.add(
                                                             f"chaticon_{icon}.png"
+                                                        )
+                                                        stamp = chat.get("stamp")
+                                                        self.filename_plaintexts.add(
+                                                            f"{stamp}.png"
                                                         )
 
                                 for line in scene["lines"]:  # 0000
