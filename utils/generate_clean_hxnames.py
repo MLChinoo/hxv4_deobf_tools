@@ -28,7 +28,7 @@ def generate_clean_hxnames(base_hxnames_filepath: Path, deobfuscated_dir: Path, 
             else:
                 raise Exception(hx_hash)
 
-        save_file.write(f"94D4A97C61498621:/\n")
+        # save_file.write(f"94D4A97C61498621:/\n")
         for xp3_dir in deobfuscated_dir.iterdir():
             for child in xp3_dir.rglob('*'):
                 if child.is_file():

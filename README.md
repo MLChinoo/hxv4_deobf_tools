@@ -20,19 +20,19 @@ A2: 支持从hxv4 crypted游戏（举例：魔女的夜宴 Steam版、星光咖�
 - 视频文件（video）
 - …………
 
+项目当前针对Limelight Lemonade Jam进行开发，因此对于其他游戏的支持可能有所欠缺。
+
+若你完善了对其他游戏的支持，欢迎创建Pull Request来帮助这个项目变得更好！😘
+
 **Q3: 如何使用？**
 
 A3: 使用如下，请自行尝试：
 
-1. 使用GARbro2或KrkrExtractForCxdecV2提取xp3
+1. 使用GARbro2或KrkrExtractForCxdecV2提取xp3；
 
-2. 使用utils/restore_dir_structure.py和utils/move_bomhash_files.py初步整理提取出的文件夹结构
+2. [可选]使用utils/restore_dir_structure.py初步整理提取出的文件夹结构；
 
 3. 在config.py中更改配置，需更改的字段如下：
-
-   `game_dir: 游戏目录`
-
-   `game_exe: 游戏可执行文件名，需在游戏目录下`
 
    `rename_dir: 待还原文件名的文件夹，即提取出的文件夹`
 
@@ -40,17 +40,19 @@ A3: 使用如下，请自行尝试：
 
    `pbd2json_exe: pbd2json.exe文件路径，此文件已随附在项目中`
 
-4. 在main.py开头处添加明文字典来源，具体使用方法可参照main.py及PlainDict.py中的注释
+   `krkrhxv4hash_dll: KrkrHxv4Hash.dll文件路径，此文件已随附在项目中`
 
-5. 将随附的krkr_hxv4_dumphash.dll重命名为version.dll，并放置在游戏目录下，与游戏可执行文件同一目录
+4. 在main.py开头处添加明文字典来源，具体使用方法可参照main.py及PlainDict.py中的注释；
 
-6. 运行main.py，即可还原文件名并自动重命名文件名和目录名
+5. 运行main.py，即可还原文件名并自动重命名文件名和目录名；
 
-7. 运行后生成的HxNames.lst可供GARbro等工具使用
+6. 运行后生成的HxNames.lst可供GARbro等工具使用。
+
+    - 若做发布用途，建议使用utils/generate_clean_hxnames.py再生成一份干净的文件。
 
 **使用此项目生成：**
 
-- [天使嚣嚣 Hikari - ten_sz_hxnames](https://github.com/MLChinoo/ten_sz_hxnames)
+- [天使☆嚣嚣 RE-BOOT!（Hikari Field版） - ten_sz_hxnames](https://github.com/MLChinoo/ten_sz_hxnames)
 - [Limelight Lemonade Jam - lllj_hxnames](https://github.com/MLChinoo/lllj_hxnames)
 
 **特别感谢：**
@@ -62,3 +64,4 @@ A3: 使用如下，请自行尝试：
 - [~~crskycode/KrkrDump~~](https://github.com/crskycode/KrkrDump)（已被删除，[Fork](https://github.com/MLChinoo/KrkrDump-Hasher)）
 - [UserUnknownFactor/GARbro2](https://github.com/UserUnknownFactor/GARbro2)
 - [lictex/atri-composite](https://github.com/lictex/atri-composite)
+- [MishaIac/KrkrHxv4Hash](https://github.com/MishaIac/KrkrHxv4Hash)

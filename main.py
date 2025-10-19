@@ -5,10 +5,11 @@ from pathlib import Path
 import config
 from PlainDict import PlainDict
 from utils.move_bomhash_files import get_unique_name, merge_dir
+from utils.krkrhxv4hash import get_filehash, get_pathhash
 
 dictionary = (PlainDict(
     pathnames=[
-        
+        "/"
     ],
     filenames=[
         "base.stage",
@@ -23,9 +24,8 @@ dictionary = (PlainDict(
     ]
 )
 # 在这里添加明文字典来源：
-              #.from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\3lj_data")
-              #.from_unobfuscated_directory(r"D:\gals\dumps\stella_dumps\uipsd")
-              #.scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch")
+              #.from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\3lj_data_full")
+              #.scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
               #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\base.stage")
               #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\cglist.csv")
               #.from_soundlist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\soundlist.csv")
@@ -34,7 +34,7 @@ dictionary = (PlainDict(
               #.from_bgv_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice")
               #.from_savelist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\savelist.csv")
               #.from_scenelist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\scenelist.csv")
-              .from_krkrdump_logs(r"C:\Users\MLChinoo\Desktop\krkrdump")
+              #.from_krkrdump_logs(r"Z:\游戏存档\lllj krkrdump")
               #.find_missing_voices([
               #    r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice",
               #    r"C:\Users\MLChinoo\Desktop\3lj_data_full\voice2",
@@ -72,42 +72,53 @@ print(f"新增hash：")
 for to_hash in (path_to_hash, file_to_hash):
     for t in to_hash:
         print(t)
+print()
 
-# krkr_hxv4_dumphash在命令运行目录下生成文件，而不是游戏目录下
-with (open("files.txt", "w", encoding="utf-16le") as f,
-      open("dirs.txt", "w", encoding="utf-16le") as d):
-    for pathname_plaintext in path_to_hash:
-        d.write(f"{pathname_plaintext}\n")
-    for filename_plaintext in file_to_hash:
-        f.write(f"{filename_plaintext}\n")
-
-os.startfile(config.game_exe)
-input("计算完成后手动按回车继续：")
-
-with (open("files_match.txt", "r", encoding="utf-16le") as fm,
-      open("dirs_match.txt", "r", encoding="utf-16le") as dm):
-
-    fm_lines = fm.readlines()
-    for line in fm_lines:
-        line = line.replace("\ufeff", "")  # remove bom
-        if line.strip() == "":
-            continue
-        if len(splitted := line.replace("\n", "").split(",")) != 2:
-            print(f"illegal line ignored: {line}")
-            continue
-        hx_name, hx_hash = splitted
-        file_hash_map[hx_name] = hx_hash
-
-    dm_lines = dm.readlines()
-    for line in dm_lines:
-        line = line.replace("\ufeff", "")  # remove bom
-        if line.strip() == "":
-            continue
-        if len(splitted := line.replace("\n", "").split(",")) != 2:
-            print(f"illegal line ignored: {line}")
-            continue
-        hx_name, hx_hash = splitted
-        path_hash_map[hx_name] = hx_hash
+if True:
+    for pathname in path_to_hash:
+        pathname = pathname.strip().replace("\ufeff", "")  # remove bom
+        if pathname != "":
+            assert "/" in pathname
+        path_hash_map[pathname] = get_pathhash(pathname)
+    for filename in file_to_hash:
+        filename = filename.strip().replace("\ufeff", "")  # remove bom
+        file_hash_map[filename] = get_filehash(filename)
+else:
+    # krkr_hxv4_dumphash在命令运行目录下生成文件，而不是游戏目录下
+    with (open("files.txt", "w", encoding="utf-16le") as f,
+          open("dirs.txt", "w", encoding="utf-16le") as d):
+        for pathname_plaintext in path_to_hash:
+            d.write(f"{pathname_plaintext}\n")
+        for filename_plaintext in file_to_hash:
+            f.write(f"{filename_plaintext}\n")
+    
+    os.startfile(config.game_exe)
+    input("计算完成后手动按回车继续：")
+    
+    with (open("files_match.txt", "r", encoding="utf-16le") as fm,
+          open("dirs_match.txt", "r", encoding="utf-16le") as dm):
+    
+        fm_lines = fm.readlines()
+        for line in fm_lines:
+            line = line.replace("\ufeff", "")  # remove bom
+            if line.strip() == "":
+                continue
+            if len(splitted := line.replace("\n", "").split(",")) != 2:
+                print(f"illegal line ignored: {line}")
+                continue
+            hx_name, hx_hash = splitted
+            file_hash_map[hx_name] = hx_hash
+    
+        dm_lines = dm.readlines()
+        for line in dm_lines:
+            line = line.replace("\ufeff", "")  # remove bom
+            if line.strip() == "":
+                continue
+            if len(splitted := line.replace("\n", "").split(",")) != 2:
+                print(f"illegal line ignored: {line}")
+                continue
+            hx_name, hx_hash = splitted
+            path_hash_map[hx_name] = hx_hash
 
 with open("HxNames.lst", mode="w", encoding="UTF-8") as h:
     for hash_map in (path_hash_map, file_hash_map):
