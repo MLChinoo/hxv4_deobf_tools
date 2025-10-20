@@ -8,13 +8,13 @@ import os
 
 rename_dir = r"C:\Users\MLChinoo\Desktop\3lj_data_full"
 
-psbdecompile_exe = r"C:\Users\MLChinoo\PycharmProjects\hxv4_deobf_tools\psbdecompile\PsbDecompile.exe"
-
-pbd2json_exe = r"C:\Users\MLChinoo\PycharmProjects\hxv4_deobf_tools\pbd2json.exe"
-
-krkrhxv4hash_dll = r"C:\Users\MLChinoo\PycharmProjects\hxv4_deobf_tools\KrkrHxv4Hash.dll"
-
 # ==========结束==========
+
+psbdecompile_exe = r"binaries\psb_decompile\PsbDecompile.exe"
+
+pbd2json_exe = r"binaries\pbd2json.exe"
+
+krkrhxv4hash_dll = r"binaries\KrkrHxv4Hash.dll"
 
 temp_dir = "temp"
 

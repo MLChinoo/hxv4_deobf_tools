@@ -36,12 +36,6 @@ A3: 使用如下，请自行尝试：
 
    `rename_dir: 待还原文件名的文件夹，即提取出的文件夹`
 
-   `psbdecompile_exe: PsbDecompile.exe文件路径，此文件已随附在项目中`
-
-   `pbd2json_exe: pbd2json.exe文件路径，此文件已随附在项目中`
-
-   `krkrhxv4hash_dll: KrkrHxv4Hash.dll文件路径，此文件已随附在项目中`
-
 4. 在main.py开头处添加明文字典来源，具体使用方法可参照main.py及PlainDict.py中的注释；
 
 5. 运行main.py，即可还原文件名并自动重命名文件名和目录名；

@@ -4,8 +4,8 @@ from pathlib import Path
 
 import config
 from PlainDict import PlainDict
-from utils.move_bomhash_files import get_unique_name, merge_dir
-from utils.krkrhxv4hash import get_filehash, get_pathhash
+from utils.deprecated.move_bomhash_files import get_unique_name, merge_dir
+from utils.krkr_hxv4_hash import get_filehash, get_pathhash
 
 dictionary = (PlainDict(
     pathnames=[
