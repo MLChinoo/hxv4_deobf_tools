@@ -4,7 +4,7 @@
 """
 from pathlib import Path
 
-from utils.check_hash import is_name_hash, is_path_hash
+from utils.krkr_hxv4_hash import is_file_hash, is_path_hash
 
 
 def generate_clean_hxnames(base_hxnames_filepath: Path, deobfuscated_dir: Path, save_filepath: Path):
@@ -33,7 +33,7 @@ def generate_clean_hxnames(base_hxnames_filepath: Path, deobfuscated_dir: Path, 
             for child in xp3_dir.rglob('*'):
                 if child.is_file():
                     hx_name = child.name
-                    if is_name_hash(hx_name):
+                    if is_file_hash(hx_name):
                         continue
                     print(hx_name)
                     if hx_name not in file_hash_map:

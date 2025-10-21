@@ -32,15 +32,11 @@ A3: 使用如下，请自行尝试：
 
 2. [可选]使用utils/restore_dir_structure.py初步整理提取出的文件夹结构；
 
-3. 在config.py中更改配置，需更改的字段如下：
+3. 在main.py开头处更改目录配置及添加明文字典来源，具体使用方法可参照main.py及plain_dict.py中的注释；
 
-   `rename_dir: 待还原文件名的文件夹，即提取出的文件夹`
+4. 运行main.py，即可还原文件名并自动重命名文件名和目录名；
 
-4. 在main.py开头处添加明文字典来源，具体使用方法可参照main.py及PlainDict.py中的注释；
-
-5. 运行main.py，即可还原文件名并自动重命名文件名和目录名；
-
-6. 运行后生成的HxNames.lst可供GARbro等工具使用。
+5. 运行后生成的HxNames.lst可供GARbro等工具使用。
 
     - 若做发布用途，建议使用utils/generate_clean_hxnames.py再生成一份干净的文件。
 

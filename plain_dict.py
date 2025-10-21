@@ -13,15 +13,17 @@ from collections.abc import Iterable
 
 import json5
 
-import config
-from utils.check_hash import is_path_hash, is_name_hash
+from config import Config
+from utils.krkr_hxv4_hash import is_path_hash, is_file_hash
 from utils.tjs_parser import parse_base_stage_to_json5
 
 
 class PlainDict:
+    config: Config
     pathname_plaintexts, filename_plaintexts = set(), set()
 
-    def __init__(self, pathnames: list | tuple = (), filenames: list | tuple = ()):
+    def __init__(self, config: Config, pathnames: list | tuple = (), filenames: list | tuple = ()):
+        self.config = config
         self.pathname_plaintexts.update(pathnames)
         self.filename_plaintexts.update(filenames)
 
@@ -53,7 +55,7 @@ class PlainDict:
                     self.pathname_plaintexts.add("/".join(suffix_levels) + "/")
 
             for file in files:
-                if not is_name_hash(file.split(".")[0]):
+                if not is_file_hash(file.split(".")[0]):
                     self.filename_plaintexts.add(file)
 
         return self
@@ -209,10 +211,10 @@ class PlainDict:
                         f"{voice_name}.{voice_extension}"
                     ])
                             
-        if not os.path.exists(config.psb_type_cache_json):
-            open(config.psb_type_cache_json, mode="w", encoding="UTF-8")
+        if not os.path.exists(self.config.psb_type_cache_json):
+            open(self.config.psb_type_cache_json, mode="w", encoding="UTF-8")
         with suppress(JSONDecodeError):
-            with open(config.psb_type_cache_json, mode="r", encoding="UTF-8") as ptcf:
+            with open(self.config.psb_type_cache_json, mode="r", encoding="UTF-8") as ptcf:
                 ptcj: dict = json.load(ptcf)
                 for key in psb_type_cache.keys():
                     psb_type_cache[key] = ptcj.get(key, [])
@@ -224,14 +226,14 @@ class PlainDict:
                         and file not in psb_type_cache["motion"]:
                     try:
                         json_filename = convert_to_custom_extension(file, ".json")
-                        json_filepath = os.path.join(config.temp_dir, json_filename)
+                        json_filepath = os.path.join(self.config.temp_dir, json_filename)
 
                         if not os.path.exists(json_filepath):
-                            shutil.copy(filepath, temp_filepath := os.path.join(config.temp_dir, file))
-                            subprocess.run([config.psbdecompile_exe, '-raw', temp_filepath], check=True)
+                            shutil.copy(filepath, temp_filepath := os.path.join(self.config.temp_dir, file))
+                            subprocess.run([self.config.psbdecompile_exe, '-raw', temp_filepath], check=True)
                             os.remove(temp_filepath)
                             resx_json_filename = convert_to_custom_extension(file, ".resx.json")
-                            resx_json_filepath = os.path.join(config.temp_dir, resx_json_filename)
+                            resx_json_filepath = os.path.join(self.config.temp_dir, resx_json_filename)
                             os.remove(resx_json_filepath)
 
                         json_f = open(json_filepath, mode="r", encoding="UTF-8")
@@ -305,11 +307,11 @@ class PlainDict:
                         json_f.close()
                     except Exception:
                         traceback.print_exc()
-        with open(config.psb_type_cache_json, mode="w", encoding="UTF-8") as ptcf:
+        with open(self.config.psb_type_cache_json, mode="w", encoding="UTF-8") as ptcf:
             json.dump(psb_type_cache, ptcf, indent=4)
-        for root, dirs, files in os.walk(config.temp_dir):
+        for root, dirs, files in os.walk(self.config.temp_dir):
             for d in dirs:
-                shutil.rmtree(os.path.join(config.temp_dir, d))
+                shutil.rmtree(os.path.join(self.config.temp_dir, d))
         return self
 
     """
@@ -699,7 +701,7 @@ class PlainDict:
             if is_valid_pbd(child):
                 character_prefix = child.stem
                 try:
-                    cmd_result = subprocess.run([config.pbd2json_exe, child.absolute()], capture_output=True, text=True, check=True)
+                    cmd_result = subprocess.run([self.config.pbd2json_exe, child.resolve()], capture_output=True, text=True, check=True)
                     if cmd_result.stdout != "":
                         pbd_json = json.loads(cmd_result.stdout)
                         assert type(pbd_json) == list
@@ -727,7 +729,7 @@ class PlainDict:
         child = Path(chthum_index_pbd_filepath)
         if is_valid_pbd(child):
             try:
-                cmd_result = subprocess.run([config.pbd2json_exe, child.absolute()], capture_output=True, text=True, check=True)
+                cmd_result = subprocess.run([self.config.pbd2json_exe, child.resolve()], capture_output=True, text=True, check=True)
                 if cmd_result.stdout != "":
                     pbd_json = json.loads(cmd_result.stdout)
                     assert type(pbd_json) == dict
@@ -742,6 +744,4 @@ class PlainDict:
         return self
                             
 if __name__ == "__main__":
-    for root, dirs, files in os.walk(config.temp_dir):
-        for d in dirs:
-            shutil.rmtree(os.path.join(config.temp_dir, d))
+    pass

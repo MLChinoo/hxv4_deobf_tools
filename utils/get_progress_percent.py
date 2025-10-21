@@ -5,7 +5,7 @@
 """
 import os
 
-from check_hash import is_path_hash, is_name_hash
+from krkr_hxv4_hash import is_path_hash, is_file_hash
 
 def get_progress_percent(root_dir: str) -> float:
     total_path = 0
@@ -22,7 +22,7 @@ def get_progress_percent(root_dir: str) -> float:
                 # 未知文件，与游戏无关，疑似为GARbro提取时的bug
                 continue
             total_file += 1
-            if is_name_hash(file):
+            if is_file_hash(file):
                 hashed_file += 1
     return 1 - (hashed_path + hashed_file) / (total_path + total_file)
 

@@ -2,12 +2,21 @@ import os
 import shutil
 from pathlib import Path
 
-import config
-from PlainDict import PlainDict
-from utils.deprecated.move_bomhash_files import get_unique_name, merge_dir
-from utils.krkr_hxv4_hash import get_filehash, get_pathhash
+from config import Config
+from plain_dict import PlainDict
+from utils.file_utils import get_unique_name, merge_dir
+from utils.krkr_hxv4_hash import set_hashlib, get_file_hash, get_path_hash
+
+current_config = Config(
+    project_dir=Path(__file__).resolve().parent,
+# 在这里更改目录配置：
+    rename_dir=Path(r"D:\gals\dumps\tenshi_hikari_dumps")
+# 结束
+)
+set_hashlib(current_config)
 
 dictionary = (PlainDict(
+    config=current_config,
     pathnames=[
         "/"
     ],
@@ -25,7 +34,7 @@ dictionary = (PlainDict(
 )
 # 在这里添加明文字典来源：
               #.from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\3lj_data_full")
-              #.scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
+              .scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
               #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\base.stage")
               #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\cglist.csv")
               #.from_soundlist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\data\main\soundlist.csv")
@@ -79,10 +88,10 @@ if True:
         pathname = pathname.strip().replace("\ufeff", "")  # remove bom
         if pathname != "":
             assert "/" in pathname
-        path_hash_map[pathname] = get_pathhash(pathname)
+        path_hash_map[pathname] = get_path_hash(pathname)
     for filename in file_to_hash:
         filename = filename.strip().replace("\ufeff", "")  # remove bom
-        file_hash_map[filename] = get_filehash(filename)
+        file_hash_map[filename] = get_file_hash(filename)
 else:
     # krkr_hxv4_dumphash在命令运行目录下生成文件，而不是游戏目录下
     with (open("files.txt", "w", encoding="utf-16le") as f,
@@ -127,12 +136,12 @@ with open("HxNames.lst", mode="w", encoding="UTF-8") as h:
                 continue
             h.write(f"{hash}:{name}\n")
 
-if config.rename_dir != "":
+if current_config.rename_dir != "":
     renamed_file_count = 0
     renamed_dir_count = 0
     hash_path_map = {value: key for key, value in path_hash_map.items()}
     hash_file_map = {value: key for key, value in file_hash_map.items()}
-    for root, dirs, files in os.walk(config.rename_dir, topdown=False):
+    for root, dirs, files in os.walk(current_config.rename_dir, topdown=False):
         for f in files:
             filepath = os.path.join(root, f)
             if f in hash_file_map.keys():
@@ -142,9 +151,9 @@ if config.rename_dir != "":
                 try:
                     os.rename(filepath, new_path)
                     renamed_file_count += 1
-                    print(f"文件重命名成功: {Path(filepath).relative_to(config.rename_dir)} -> {Path(new_path).relative_to(config.rename_dir)}")
+                    print(f"文件重命名成功: {Path(filepath).relative_to(current_config.rename_dir)} -> {Path(new_path).relative_to(current_config.rename_dir)}")
                 except Exception as e:
-                    print(f"文件重命名失败: {Path(filepath).relative_to(config.rename_dir)} -> {Path(new_path).relative_to(config.rename_dir)}，原因: {e}")
+                    print(f"文件重命名失败: {Path(filepath).relative_to(current_config.rename_dir)} -> {Path(new_path).relative_to(current_config.rename_dir)}，原因: {e}")
         for d in dirs:
             dirpath = os.path.join(root, d)
             if d in hash_path_map.keys():
@@ -161,7 +170,7 @@ if config.rename_dir != "":
                     else:
                         shutil.move(dirpath, dest_path)
                     renamed_dir_count += 1
-                    print(f"目录重命名成功: {Path(dirpath).relative_to(config.rename_dir)} -> {Path(dest_path).relative_to(config.rename_dir)}")
+                    print(f"目录重命名成功: {Path(dirpath).relative_to(current_config.rename_dir)} -> {Path(dest_path).relative_to(current_config.rename_dir)}")
                 except Exception as e:
-                    print(f"目录重命名失败: {Path(dirpath).relative_to(config.rename_dir)} -> {Path(dest_path).relative_to(config.rename_dir)}，原因: {e}")
+                    print(f"目录重命名失败: {Path(dirpath).relative_to(current_config.rename_dir)} -> {Path(dest_path).relative_to(current_config.rename_dir)}，原因: {e}")
     print(f"重命名完成：共重命名文件 {renamed_file_count} 个，目录 {renamed_dir_count} 个")
