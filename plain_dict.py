@@ -22,7 +22,7 @@ class PlainDict:
     config: Config
     pathname_plaintexts, filename_plaintexts = set(), set()
 
-    def __init__(self, config: Config, pathnames: list | tuple = (), filenames: list | tuple = ()):
+    def __init__(self, config, pathnames, filenames):
         self.config = config
         self.pathname_plaintexts.update(pathnames)
         self.filename_plaintexts.update(filenames)
@@ -73,7 +73,7 @@ class PlainDict:
     扫描给定目录下的文件，对可能的psb文件进行decompile并获取信息
     """
     def scan_psb_and_decompile(self, scn_dir: str):
-        def is_psb_file(path: str | Path) -> bool:
+        def is_psb_file(path) -> bool:
             path = Path(path)
             if not path.is_file():
                 return False
