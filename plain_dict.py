@@ -581,10 +581,10 @@ class PlainDict:
                         self.filename_plaintexts.update([
                             f"{filename}.jpg",
                             f"{filename}.png",
-                            f"{filename.replace("savethum_", "thum_")}.jpg",
-                            f"{filename.replace("savethum_", "thum_")}.png",
+                            f'{filename.replace("savethum_", "thum_")}.jpg',
+                            f'{filename.replace("savethum_", "thum_")}.png',
                             f"{filename}.psb",
-                            f"{filename.replace("savethum_", "thum_")}.psb"
+                            f'{filename.replace("savethum_", "thum_")}.psb'
                         ])
         return self
     
@@ -708,7 +708,7 @@ class PlainDict:
                         for pbd_item in pbd_json:
                             if type(pbd_item) == dict and "layer_id" in pbd_item.keys():
                                 self.filename_plaintexts.add(
-                                    f"{character_prefix}_{pbd_item["layer_id"]}.tlg"
+                                    f'{character_prefix}_{pbd_item["layer_id"]}.tlg'
                                 )
                     else:
                         raise RuntimeError(f"failed to convert pbd to json: {child}")
