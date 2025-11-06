@@ -22,7 +22,7 @@ class PlainDict:
     config: Config
     pathname_plaintexts, filename_plaintexts = set(), set()
 
-    def __init__(self, config: Config, pathnames: list | tuple = (), filenames: list | tuple = ()):
+    def __init__(self, config, pathnames, filenames):
         self.config = config
         self.pathname_plaintexts.update(pathnames)
         self.filename_plaintexts.update(filenames)
@@ -73,7 +73,7 @@ class PlainDict:
     扫描给定目录下的文件，对可能的psb文件进行decompile并获取信息
     """
     def scan_psb_and_decompile(self, scn_dir: str):
-        def is_psb_file(path: str | Path) -> bool:
+        def is_psb_file(path) -> bool:
             path = Path(path)
             if not path.is_file():
                 return False
@@ -581,10 +581,10 @@ class PlainDict:
                         self.filename_plaintexts.update([
                             f"{filename}.jpg",
                             f"{filename}.png",
-                            f"{filename.replace("savethum_", "thum_")}.jpg",
-                            f"{filename.replace("savethum_", "thum_")}.png",
+                            f'{filename.replace("savethum_", "thum_")}.jpg',
+                            f'{filename.replace("savethum_", "thum_")}.png',
                             f"{filename}.psb",
-                            f"{filename.replace("savethum_", "thum_")}.psb"
+                            f'{filename.replace("savethum_", "thum_")}.psb'
                         ])
         return self
     
@@ -708,7 +708,7 @@ class PlainDict:
                         for pbd_item in pbd_json:
                             if type(pbd_item) == dict and "layer_id" in pbd_item.keys():
                                 self.filename_plaintexts.add(
-                                    f"{character_prefix}_{pbd_item["layer_id"]}.tlg"
+                                    f'{character_prefix}_{pbd_item["layer_id"]}.tlg'
                                 )
                     else:
                         raise RuntimeError(f"failed to convert pbd to json: {child}")
