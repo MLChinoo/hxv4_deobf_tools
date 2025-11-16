@@ -28,7 +28,7 @@ A2: 支持从hxv4 crypted游戏（举例：魔女的夜宴 Steam版、星光咖�
 
 A3: 使用如下，请自行尝试：
 
-1. 使用GARbro2或KrkrExtractForCxdecV2提取xp3；
+1. 使用KrkrExtractForCxdecV2（或GARBro2，若支持目标游戏）提取xp3；
 
 2. [可选]使用utils/restore_dir_structure.py初步整理提取出的文件夹结构；
 
