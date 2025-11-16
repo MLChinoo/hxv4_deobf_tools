@@ -54,6 +54,7 @@ def is_file_hash(input: str) -> bool:
         if not char.isdigit() and not char.isupper():
             return False
     return True
+
 def is_path_hash(input: str) -> bool:
     if len(input) != 16:
         return False

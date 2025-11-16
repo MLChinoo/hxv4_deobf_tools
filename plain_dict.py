@@ -270,6 +270,9 @@ class PlainDict:
                                                         self.filename_plaintexts.add(
                                                             f"{stamp}.png"
                                                         )
+                                                if "loopVoiceList" in text_item.keys():
+                                                    for loop_voice in text_item["loopVoiceList"]:
+                                                        handle_voice(loop_voice["voice"])
 
                                 for line in scene["lines"]:  # 0000
                                     if type(line) == list:
@@ -351,7 +354,7 @@ class PlainDict:
         with open(cglist_csv_filepath, mode="r", encoding="utf-16le") as f:
             cglist_csv = csv.reader(f)
             for row in cglist_csv:
-                cg_filename = row[0].strip()
+                cg_filename = row[0].strip().lower()
                 if cg_filename.startswith("#"):
                     continue
                 if ":" in cg_filename:
@@ -398,6 +401,7 @@ class PlainDict:
                                     f"thum_{filename}.psb",
                                     f"thum_{filename}_censored.psb",
                                     f"savethum_{filename}.psb",
+                                    f"{filename}.png"
                                 ])
                 # sd: 
                 if cg_filename.startswith("thum_sd"):  # thum_sd001
@@ -619,27 +623,55 @@ class PlainDict:
     某些语音存在于voice目录中，但未被任何scn引用，根本不可能在正常游戏流程中出现（即“废案语音”，例如宁宁有30个左右），
     这时即可利用语音文件名编号连续的特点，来尽可能寻找这些语音。
     """
-    def find_missing_voices(self, voice_dirs: Iterable):
-        prefix_maxnum_map = {}  # anj_000: 90
+    def find_missing_voices(self, voice_dirs: Iterable, check_file_existence = False):
+        prefixes_map = {}  # anj_000: [4, 90] / anj_loop: [2, 64]
+
+        def handle_voice_name(voice_name: str):  # anj_000_0090 / anj_loop_64
+            if voice_name.count("_") != 2:
+                # print(f"illegal missing voice name: {voice_name}")
+                return
+            prefix, num = voice_name.rsplit("_", 1)  # anj_000, 0090 / anj_loop, 64
+            if result := re.match(r'^\d+', num):
+                first_match: str = result.group(0)
+                num, size = int(first_match), len(first_match)  # 90, 4 / 64, 2
+                if prefix not in prefixes_map:
+                    prefixes_map[prefix] = [size, num]
+                else:
+                    ori_size = prefixes_map[prefix][0]
+                    if size != ori_size:
+                        print(f"{voice_name} suffix size changed: {ori_size} -> {size}")
+                    if num > prefixes_map[prefix][1]:
+                        prefixes_map[prefix][1] = num
+
         for voice_dir in voice_dirs:
             for child in Path(voice_dir).iterdir():
-                if all((child.is_file(), child.suffix in (".ogg", ".sli"), child.stem.count("_") == 2)):  # anj_000_0090.ogg
-                    prefix, num = child.stem.rsplit("_", 1)  # anj_000, 0090
-                    if result := re.match(r'^(\d{4})', num):
-                        num = int(result.group(1))  # 90
-                        if prefix not in prefix_maxnum_map:
-                            prefix_maxnum_map[prefix] = 1
-                        if num > prefix_maxnum_map[prefix]:
-                            prefix_maxnum_map[prefix] = num
-        for prefix, maxnum in prefix_maxnum_map.items():
-            for num in range(1, maxnum+1):
-                voice_name = f"{prefix}_{num:04d}"
-                if not any(((Path(vd) / f"{voice_name}.ogg").exists() for vd in voice_dirs)):
-                    print(f"found possible missing voice: {voice_name}")
+                if child.is_file():  # anj_000_0090.ogg / anj_loop_64.ogg / bgv102_02_恵凪会話.csv
+                    match child.suffix:
+                        case ".ogg" | ".sli":
+                            handle_voice_name(child.stem)
+                        case ".csv":
+                            if child.stem.startswith("bgv"):
+                                with open(child, mode="r", encoding="utf-16le") as f:
+                                    bgv_csv = csv.reader(f)
+                                    for row in bgv_csv:
+                                        if len(row) > 0 and not row[0].replace("\ufeff", "").startswith("#"):
+                                            handle_voice_name(row[2])
+
+        for prefix, _ in prefixes_map.items():
+            size, maxnum = _
+            maxnum += 5
+            for num in range(1, maxnum + 1):
+                voice_name = f"{prefix}_{num:0{size}d}"
+                for suffix in {"", "a", "b", "c"}:  # 暂时未发现其它字母后缀
+                    voice_name_suffix = voice_name + suffix
                     self.filename_plaintexts.update([
-                        f"{voice_name}.ogg",
-                        f"{voice_name}.ogg.sli"
+                        f"{voice_name_suffix}.ogg",
+                        f"{voice_name_suffix}.ogg.sli"
                     ])
+                    if check_file_existence:
+                        if not any(((Path(vd) / f"{voice_name_suffix}.ogg").exists() for vd in voice_dirs)):
+                            print(f"found possible missing voice: {voice_name_suffix}")
+
         return self
     
     """
@@ -711,7 +743,7 @@ class PlainDict:
                                     f"{character_prefix}_{pbd_item["layer_id"]}.tlg"
                                 )
                     else:
-                        raise RuntimeError(f"failed to convert pbd to json: {child}")
+                        raise RuntimeError(f"fail to convert pbd to json: {child}")
                 except Exception:
                     traceback.print_exc()     
         return self
@@ -738,7 +770,7 @@ class PlainDict:
                             filename += ".png"
                         self.filename_plaintexts.add(filename)
                 else:
-                    raise RuntimeError(f"failed to convert pbd to json: {child}")
+                    raise RuntimeError(f"fail to convert pbd to json: {child}")
             except Exception:
                 traceback.print_exc()
         return self
