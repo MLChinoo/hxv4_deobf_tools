@@ -12,12 +12,15 @@ class Config:
     krkrhxv4hash_dll = r"binaries/KrkrHxv4Hash.dll"
     
     temp_dir = "temp/"
-    psb_type_cache_json = "psb_type_cache.json"
+    psb_type_cache_pkl = "psb_type_cache.pkl"
     
     def __init__(self, project_dir, rename_dir):
         self.project_dir = Path(project_dir)
         self.rename_dir = Path(rename_dir)
-        self.psbdecompile_exe = project_dir / self.psbdecompile_exe
-        self.pbd2json_exe = project_dir / self.pbd2json_exe
-        self.krkrhxv4hash_dll = project_dir / self.krkrhxv4hash_dll
-        self.psb_type_cache_json = project_dir / self.temp_dir / self.psb_type_cache_json
+        self.psbdecompile_exe = self.project_dir / self.psbdecompile_exe
+        self.pbd2json_exe = self.project_dir / self.pbd2json_exe
+        self.krkrhxv4hash_dll = self.project_dir / self.krkrhxv4hash_dll
+        self.temp_dir = self.project_dir / self.temp_dir
+        if not self.temp_dir.exists():
+            self.temp_dir.mkdir(parents=True, exist_ok=True)
+        self.psb_type_cache_pkl = self.temp_dir / self.psb_type_cache_pkl

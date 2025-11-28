@@ -10,7 +10,7 @@ from utils.krkr_hxv4_hash import set_hashlib, get_file_hash, get_path_hash
 current_config = Config(
     project_dir=Path(__file__).resolve().parent,
 # 在这里更改目录配置：
-    rename_dir=Path(r"D:\gals\dumps\tenshi_hikari_dumps")
+    rename_dir=Path(r"C:\Users\MLChinoo\Desktop\3lj_data_full")
 # 结束
 )
 set_hashlib(current_config)
@@ -33,7 +33,7 @@ dictionary = (PlainDict(
     ]
 )
 # 在这里添加明文字典来源：
-              #.from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\3lj_data_full")
+              #.from_unobfuscated_directory(r"C:\Users\MLChinoo\Desktop\3lj_data")
               .scan_psb_and_decompile(r"C:\Users\MLChinoo\Desktop\3lj_data_full\scn")
               #.from_base_stage(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\base.stage")
               #.from_cglist_csv(r"C:\Users\MLChinoo\Desktop\3lj_data_full\patch\cglist.csv")

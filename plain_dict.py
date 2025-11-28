@@ -1,17 +1,16 @@
 import csv
 import json
+import pickle
+import json5
 import os
 import re
 import shutil
 import subprocess
 import traceback
 from itertools import product
-from json import JSONDecodeError
 from pathlib import Path
 from contextlib import suppress
 from collections.abc import Iterable
-
-import json5
 
 from config import Config
 from utils.krkr_hxv4_hash import is_path_hash, is_file_hash
@@ -92,10 +91,11 @@ class PlainDict:
             else:
                 base = filename
             return base + new_extension
+
         psb_type_cache = {
-            "scn": [],
-            "pimg": [],
-            "motion": []
+            "scn": set(),
+            "pimg": set(),
+            "motion": set()
         }
         
         def handle_data_item(data_item: dict):
@@ -211,28 +211,28 @@ class PlainDict:
                         f"{voice_name}.{voice_extension}"
                     ])
                             
-        if not os.path.exists(self.config.psb_type_cache_json):
-            open(self.config.psb_type_cache_json, mode="w", encoding="UTF-8")
-        with suppress(JSONDecodeError):
-            with open(self.config.psb_type_cache_json, mode="r", encoding="UTF-8") as ptcf:
-                ptcj: dict = json.load(ptcf)
-                for key in psb_type_cache.keys():
-                    psb_type_cache[key] = ptcj.get(key, [])
+        if not os.path.exists(self.config.psb_type_cache_pkl):
+            open(self.config.psb_type_cache_pkl, mode="wb")
+        with suppress(pickle.UnpicklingError, EOFError):
+            with open(self.config.psb_type_cache_pkl, mode="rb") as ptcf:
+                psb_type_cache = pickle.load(ptcf)
 
         for root, dirs, files in os.walk(scn_dir):
             for file in files:
-                if is_psb_file(filepath := os.path.join(root, file))\
-                        and file not in psb_type_cache["pimg"]\
-                        and file not in psb_type_cache["motion"]:
+                filepath = os.path.join(root, file)
+                file_prefix = str(Path(filepath).parent.relative_to(self.config.rename_dir)).replace("\\", "_") + "_"
+                if is_psb_file(filepath)\
+                        and file_prefix + file not in psb_type_cache["pimg"]\
+                        and file_prefix + file not in psb_type_cache["motion"]:
                     try:
-                        json_filename = convert_to_custom_extension(file, ".json")
+                        json_filename = file_prefix + convert_to_custom_extension(file, ".json")
                         json_filepath = os.path.join(self.config.temp_dir, json_filename)
 
                         if not os.path.exists(json_filepath):
-                            shutil.copy(filepath, temp_filepath := os.path.join(self.config.temp_dir, file))
+                            shutil.copy(filepath, temp_filepath := os.path.join(self.config.temp_dir, file_prefix + file))
                             subprocess.run([self.config.psbdecompile_exe, '-raw', temp_filepath], check=True)
                             os.remove(temp_filepath)
-                            resx_json_filename = convert_to_custom_extension(file, ".resx.json")
+                            resx_json_filename = file_prefix + convert_to_custom_extension(file, ".resx.json")
                             resx_json_filepath = os.path.join(self.config.temp_dir, resx_json_filename)
                             os.remove(resx_json_filepath)
 
@@ -240,7 +240,7 @@ class PlainDict:
                         psb_json: dict = json.load(json_f)
                         if "scenes" in psb_json and "name" in psb_json:
                             # scn psb
-                            psb_type_cache["scn"].append(file)
+                            psb_type_cache["scn"].add(file_prefix + file)
 
                             # 从name字段获取scn原文件名
                             self.filename_plaintexts.add(f"{psb_json['name']}.scn")
@@ -293,13 +293,13 @@ class PlainDict:
 
                         elif "height" in psb_json and "width" in psb_json:  # and "layers" in psb_json
                             # pimg psb
-                            psb_type_cache["pimg"].append(file)
+                            psb_type_cache["pimg"].add(file_prefix + file)
                             json_f.close()
                             os.remove(json_filepath)
 
                         elif psb_json.get("id") == "motion":
                             # motion psb
-                            psb_type_cache["motion"].append(file)
+                            psb_type_cache["motion"].add(file_prefix + file)
                             json_f.close()
                             os.remove(json_filepath)
 
@@ -310,8 +310,8 @@ class PlainDict:
                         json_f.close()
                     except Exception:
                         traceback.print_exc()
-        with open(self.config.psb_type_cache_json, mode="w", encoding="UTF-8") as ptcf:
-            json.dump(psb_type_cache, ptcf, indent=4)
+        with open(self.config.psb_type_cache_pkl, mode="wb") as ptcf:
+            pickle.dump(psb_type_cache, ptcf)
         for root, dirs, files in os.walk(self.config.temp_dir):
             for d in dirs:
                 shutil.rmtree(os.path.join(self.config.temp_dir, d))
