@@ -627,7 +627,7 @@ class PlainDict:
         prefixes_map = {}  # anj_000: [4, 90] / anj_loop: [2, 64]
 
         def handle_voice_name(voice_name: str):  # anj_000_0090 / anj_loop_64
-            if voice_name.count("_") != 2:
+            if "_" not in voice_name:
                 # print(f"illegal missing voice name: {voice_name}")
                 return
             prefix, num = voice_name.rsplit("_", 1)  # anj_000, 0090 / anj_loop, 64
@@ -705,7 +705,7 @@ class PlainDict:
     需要先扫描一遍psb来获取.stand文件
     """
     def from_stand_files(self, fgimage_dir):
-        for child in Path(fgimage_dir).iterdir():
+        for child in Path(fgimage_dir).rglob("*"):
             if all((child.is_file(), child.suffix == ".stand")):
                 with open(child, mode="r", encoding="utf-16le") as cf:
                     filenames = re.findall(r"filename:'([^']+)'", cf.read())
@@ -729,7 +729,7 @@ class PlainDict:
             with open(child, "rb") as f:
                 return f.read(7) == b"TJS/4s0"
             
-        for child in Path(fgimage_dir).iterdir():
+        for child in Path(fgimage_dir).rglob("*"):
             if is_valid_pbd(child):
                 character_prefix = child.stem
                 try:
